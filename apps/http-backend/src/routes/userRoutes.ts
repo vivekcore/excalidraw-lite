@@ -1,17 +1,22 @@
 import { Request, Response, Router } from "express";
- import { JWT_SECRET } from "../utils/config";
+import {JWT_SECRET} from '@repo/backend-common/config'
 import jwt from "jsonwebtoken"
+import {CreateUserSchema} from "@repo/common/types"
 const router:Router = Router();
 
 router.post('/signup', async(req:Request, res:Response) => {
-    const {name,email,password} = req.body;
+    const data = req.body;
+    const response = CreateUserSchema.safeParse(data)
+    if(!response.success){
+        return res.json({
+            message:"Incorrect inputs"
+        })
+    }
    //db call
     res.json({
         status: "success",
         user: {
-            name,
-            email,
-            password
+            
         }
     })
 })
