@@ -14,6 +14,10 @@ router.post("/create-room",Middleware, async(req:Request, res:Response) => {
                 adminId:userId,
             }
         })
+        res.status(200).json({
+            status:"success",
+            data:room
+        })
     } catch (error) {
         res.status(400).json({
             Error:error

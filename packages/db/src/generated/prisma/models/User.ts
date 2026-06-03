@@ -257,7 +257,7 @@ export type UserScalarWhereWithAggregatesInput = {
 
 export type UserCreateInput = {
   id?: string
-  email?: string
+  email: string
   name: string
   password: string
   image?: string | null
@@ -269,7 +269,7 @@ export type UserCreateInput = {
 
 export type UserUncheckedCreateInput = {
   id?: string
-  email?: string
+  email: string
   name: string
   password: string
   image?: string | null
@@ -305,7 +305,7 @@ export type UserUncheckedUpdateInput = {
 
 export type UserCreateManyInput = {
   id?: string
-  email?: string
+  email: string
   name: string
   password: string
   image?: string | null
@@ -410,7 +410,7 @@ export type UserUpdateOneRequiredWithoutRoomsNestedInput = {
 
 export type UserCreateWithoutChatsInput = {
   id?: string
-  email?: string
+  email: string
   name: string
   password: string
   image?: string | null
@@ -421,7 +421,7 @@ export type UserCreateWithoutChatsInput = {
 
 export type UserUncheckedCreateWithoutChatsInput = {
   id?: string
-  email?: string
+  email: string
   name: string
   password: string
   image?: string | null
@@ -470,7 +470,7 @@ export type UserUncheckedUpdateWithoutChatsInput = {
 
 export type UserCreateWithoutRoomsInput = {
   id?: string
-  email?: string
+  email: string
   name: string
   password: string
   image?: string | null
@@ -481,7 +481,7 @@ export type UserCreateWithoutRoomsInput = {
 
 export type UserUncheckedCreateWithoutRoomsInput = {
   id?: string
-  email?: string
+  email: string
   name: string
   password: string
   image?: string | null
