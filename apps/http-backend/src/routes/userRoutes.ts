@@ -52,7 +52,7 @@ router.post("/signin", async (req: Request, res: Response) => {
       });
     }
     const { email, password } = response.data;
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
         email,
         password,
