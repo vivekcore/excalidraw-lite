@@ -31,7 +31,7 @@ model Chat {
 model Room {
   id        Int    @id @default(autoincrement())
   slug      String @unique
-  name      String? @default("Untiteled")
+  name      String? 
   createdAt DateTime @default(now())
   adminId   String
   admin     User   @relation(fields: [adminId], references: [id])
