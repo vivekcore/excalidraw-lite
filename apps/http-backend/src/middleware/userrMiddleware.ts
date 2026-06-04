@@ -4,12 +4,18 @@ import { JWT_SECRET } from "@repo/backend-common/config";
 
 export const Middleware = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.headers["authorization"] ?? "";
-    if (!token) {
+    const headers = req.headers["authorization"];
+    if (!headers) {
       res.status(403).json({
         message: "token is missing",
       });
       return;
+    }
+    const token = headers.split(" ")[1];
+    if (!token) {
+      return res.json({
+        message: "token is missing",
+      });
     }
     const decoded = jwt.verify(token, JWT_SECRET);
     if (decoded) {
@@ -18,7 +24,7 @@ export const Middleware = (req: Request, res: Response, next: NextFunction) => {
     next();
   } catch (error) {
     res.status(403).json({
-        message:"Unauthrized"+error
-    })
+      message: "Unauthrized" + error,
+    });
   }
 };

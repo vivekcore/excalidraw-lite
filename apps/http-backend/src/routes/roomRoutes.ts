@@ -7,10 +7,13 @@ const router: Router = Router();
 router.post("/create-room", Middleware, async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
+    const name = req.body.name;
     const slug = GenerateSlug();
+   const cSlug = (await slug).toString();
     const room = await prisma.room.create({
       data: {
-        slug: (await slug).toString(),
+        slug: cSlug,
+        name: name || "Untitled",
         adminId: userId,
       },
     });
@@ -48,7 +51,7 @@ router.get("/chats/:roomId", async (req: Request, res: Response) => {
 });
 router.get("/slug/:slug", async (req: Request, res: Response) => {
   try {
-    const slug = req.query.slug as string;
+    const slug = req.params.slug as string;
     const room = await prisma.room.findFirst({
       where: {
         slug,
@@ -64,4 +67,22 @@ router.get("/slug/:slug", async (req: Request, res: Response) => {
     });
   }
 });
+router.get("/my-rooms",async(req:Request,res:Response) => {
+  try {
+    const userId = req.userId;
+    const room = await prisma.room.findMany({
+      where:{
+        adminId:userId
+      }
+    })
+    res.status(200).json({
+      status:"success",
+      data:room
+    })
+  } catch (error) {
+    res.json({
+      error
+    })
+  }
+})
 export default router;
