@@ -1,5 +1,6 @@
 "use client"
 import axios from "axios";
+import {useRouter} from "next/navigation";
 import React from "react";
 import {  SubmitHandler, useForm } from "react-hook-form";
 
@@ -9,6 +10,7 @@ interface Ifeildvalues {
 }
 const SignIn = () => {
   const { register, handleSubmit, reset } = useForm<Ifeildvalues>();
+  const router = useRouter()
   const onSubmit: SubmitHandler<Ifeildvalues> = async (data) => {
     try {
       const response = await axios.post(
@@ -17,10 +19,12 @@ const SignIn = () => {
           ...data,
         },
       );
+      
       if (response.status === 200) {
-        //localStorage.setItem('token',response.data).
+        localStorage.setItem('token',response.data?.token)
         console.log(response.data);
         reset()
+        router.push("/room")
       }
     } catch (error) {
       console.log(error);
