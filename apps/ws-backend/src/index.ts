@@ -9,7 +9,7 @@ interface User {
   room: string[];
   userId: string;
 }
-const users: User[] = [];
+let users: User[] = [];
 const checkUser = (token: string): string | null => {
   try {
     const decode = jwt.verify(token, JWT_SECRET);
@@ -41,11 +41,21 @@ wss.on("connection", function connection(ws, request) {
     ws.close();
     return;
   }
+
+  const existing = users.filter((u) => u.userId === userId);
+  existing.forEach((u) => u.ws.close());
+  users = users.filter((u) => u.userId !== userId);
+
   users.push({
     ws,
     userId,
     room: [],
   });
+
+  ws.on("close", () => {
+    users = users.filter((u) => u.ws !== ws);
+  });
+
   ws.on("message", async (data) => {
     try {
       const parseData = JSON.parse(data as unknown as string);
@@ -59,12 +69,19 @@ wss.on("connection", function connection(ws, request) {
         if (!user) {
           return;
         }
-        user.room = user.room.filter((x) => x === parseData.roomId);
+        user.room = user.room.filter((x) => x !== parseData.roomId);
       }
 
       if (parseData.type === "chat") {
-        const roomId = parseData.roomId;
+        const roomId = Number(parseData.roomId);
         const message = parseData.message;
+        
+        const sender = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { name: true }
+        });
+        const userName = sender?.name || "Unknown";
+
         await prisma.chat.create({
           data: {
             message,
@@ -73,12 +90,14 @@ wss.on("connection", function connection(ws, request) {
           },
         });
         users.forEach((user) => {
-          if (user.room.includes(roomId)) {
+          if (user.room.includes(parseData.roomId) && ws !== user.ws) {
             user.ws.send(
               JSON.stringify({
                 type: "chat",
                 message: message,
                 roomId,
+                userId,
+                userName,
               }),
             );
           }
