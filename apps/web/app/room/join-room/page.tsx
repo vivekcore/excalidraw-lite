@@ -1,33 +1,16 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import { api } from "../../../utils/axiox";
 
 const JoinRoom = () => {
   const { register, handleSubmit } = useForm<{ slug: string }>();
   const router = useRouter();
-  const [token, setToken] = useState<string>();
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token || token === null) {
-      router.push("/auth");
-      return;
-    }
-    setToken(token);
-  }, [router]);
 
   const onSubmit = async (data: { slug: string }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8000/api/v1/room/slug/${data.slug}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        },
-      );
+      const response = await api.get(`/room/slug/${data.slug}`);
 
       if (response.status === 200) {
         router.push(`/slug/${data.slug}`);

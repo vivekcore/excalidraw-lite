@@ -1,7 +1,7 @@
 "use client";
-import axios from "axios";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { api } from "../../../utils/axiox";
 
 interface Ifeildvalues {
   name: string;
@@ -12,12 +12,7 @@ const SignUp = () => {
   const { register, handleSubmit, reset } = useForm<Ifeildvalues>();
   const onSubmit: SubmitHandler<Ifeildvalues> = async (data) => {
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/v1/user/signup",
-        {
-          ...data,
-        },
-      );
+      const response = await api.post("/user/signup", data);
 
       if (response.status === 200) {
         reset();

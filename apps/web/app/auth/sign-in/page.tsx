@@ -1,8 +1,8 @@
 "use client"
-import axios from "axios";
 import {useRouter} from "next/navigation";
 import React from "react";
-import {  SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { api } from "../../../utils/axiox";
 
 interface Ifeildvalues {
   email: string;
@@ -13,16 +13,10 @@ const SignIn = () => {
   const router = useRouter()
   const onSubmit: SubmitHandler<Ifeildvalues> = async (data) => {
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/v1/user/signin",
-        {
-          ...data,
-        },
-      );
+      const response = await api.post("/user/signin", data);
       
       if (response.status === 200) {
-        localStorage.setItem('token',response.data?.token)
-        console.log(response.data);
+        localStorage.setItem('token', response.data?.token)
         reset()
         router.push("/room")
       }

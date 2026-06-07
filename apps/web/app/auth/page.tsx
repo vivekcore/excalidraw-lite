@@ -7,8 +7,8 @@ const AuthPage = () => {
   return (
     <div>
         <div>
-            <button onClick={() => router.push("/auth/sing-up")}>Sign Up</button>
-            <button onClick={() => router.push("/auth/sign-in")}>Sing In</button>
+            <button onClick={() => router.push("/auth/sign-up")}>Sign Up</button>
+            <button onClick={() => router.push("/auth/sign-in")}>Sign In</button>
         </div>
     </div>
   )

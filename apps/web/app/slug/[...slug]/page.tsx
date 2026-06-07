@@ -1,60 +1,27 @@
- "use client"
+"use client";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { ChatRoom } from "../../../components/ChatRoom";
+import { api } from "../../../utils/axiox";
 
-import axios from "axios"
-import { DATABASE_URL } from "../../../config"
-import { ChatRoom } from "../../../components/ChatRoom"
+export default function ChatRoomSlug() {
+  const params = useParams();
+  const slug = params?.slug?.[0];
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
+  useEffect(() => {
+    if (!slug) return;
+    api.get(`/room/slug/${slug}`)
+      .then((r) => setRoomId(r.data?.data?.id))
+      .catch(() => setError(true));
+  }, [slug]);
 
-async function getRoomId(slug:string) {
-  const response = await axios.get(`${DATABASE_URL}/room/${slug}`)
-  return response.data?.id
+  if (error) return <div>Server error with 404</div>;
+  if (!roomId) return <div>Loading...</div>;
+
+  return <ChatRoom id={roomId} />;
 }
-
-export default async function chatRoom({
-  params
-}:{
-  params:{
-    slug:string
-  }
-}){
-  const slug = await params.slug;
-  const roomId = await getRoomId(slug) as string;
-
-  return (
-    <div>
-      <ChatRoom id={roomId}/>
-    </div>
-  )
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { useRouter } from 'next/navigation'
 // import React, { useEffect } from 'react'

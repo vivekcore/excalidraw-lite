@@ -1,8 +1,8 @@
 "use client";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { api } from "../../../utils/axiox";
 interface ICreateRoom {
   name: string;
 }
@@ -18,7 +18,6 @@ const CreateRoom = () => {
   const [slug, setSlug] = useState();
   const [isRoomCreated, setIsRoomCreated] = useState<boolean>(true);
   const [rooms, setRooms] = useState<IRooms[]>([]);
-  const [token, setToken] = useState<string>();
   const [host,setHost] = useState<string>()
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -26,45 +25,26 @@ const CreateRoom = () => {
       router.push("/auth");
       return;
     }
-    setToken(token);
     setHost(window.location.host);
   }, [router]);
 
   useEffect(() => {
     const GetMyRooms = async () => {
       try {
-        const myRoom = await axios.get(
-          "http://localhost:8000/api/v1/room/my-rooms",
-          {
-            headers: {
-              Authorization: `Beater ${token}`,
-              Accept: "application/json",
-            },
-          },
-        );
+        const myRoom = await api.get("/room/my-rooms");
         setRooms(myRoom.data?.data);
       } catch (error) {
         console.log(error);
       }
     };
     GetMyRooms();
-  }, [slug, token]);
+  }, [slug]);
 
   const onSubmit = async (data: ICreateRoom) => {
-    console.log("clicked")
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/v1/room/create-room",
-        {
-          name: data.name,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        },
-      );
+      const response = await api.post("/room/create-room", {
+        name: data.name,
+      });
       setSlug(response.data?.data?.slug);
       setIsRoomCreated(!isRoomCreated);
       reset();

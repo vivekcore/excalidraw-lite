@@ -1,14 +1,21 @@
-import axios from "axios";
-import { DATABASE_URL } from "../config";
+"use client"
+import { useEffect, useState } from "react";
+import { api } from "../utils/axiox";
 import ChatRoomClient from "./ChatRoomClient";
 
-async function getChats(roomId: string){
-    const response = await axios.get(`${DATABASE_URL}/chats/${roomId}`)
-    return response.data?.data?.message
-}
+// async function getChats(roomId: string){
+ 
 
-export async function ChatRoom({id}:{id:string}) {
-    const messages = await getChats(id);
+//     const response = await api.get(`/chats/${roomId}`)
+//     return response.data?.data?.message
+// }
+
+export function ChatRoom({id}:{id:string}) {
+    
+    const [messages, setMessages] = useState([]);
+    useEffect(() => {
+        api.get(`/room/chats/${id}`).then((r) => setMessages(r.data.data));
+    },[id])
    
     return <ChatRoomClient id={id} messages={messages}/>
 }
