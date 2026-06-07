@@ -3,6 +3,7 @@ import { JWT_SECRET } from "@repo/backend-common/config";
 import jwt from "jsonwebtoken";
 import { CreateUserSchema, SignSchema } from "@repo/common/types";
 import { prisma } from "@repo/db/prisma";
+import { Middleware } from "../middleware/userrMiddleware.js";
 const router: Router = Router();
 
 router.post("/signup", async (req: Request, res: Response) => {
@@ -78,4 +79,28 @@ router.post("/signin", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/me", Middleware, async (req: Request, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+    res.status(200).json({
+      status: "success",
+      data: user,
+    });
+  } catch (error) {
+    res.status(400).json({
+      error,
+    });
+  }
+});
+
 export default router;
+

@@ -34,6 +34,13 @@ router.get("/chats/:roomId", async (req: Request, res: Response) => {
       where: {
         roomId,
       },
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
       orderBy: {
         id: "desc",
       },
