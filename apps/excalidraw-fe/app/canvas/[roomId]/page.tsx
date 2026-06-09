@@ -1,21 +1,19 @@
-
-
-
 "use client";
-import React, { useEffect, useRef } from 'react'
+import InitDraw from "@/draw";
+import React, { useEffect, useRef } from "react";
 
 const Canvas = () => {
-const cnavasref = useRef<HTMLCanvasElement>(null);
-    useEffect(() => {
-        if(cnavasref.current){
-            const canvas = cnavasref.current;
-            const ctx = canvas.getContext("2d");
-            ctx?.fillRect(25,25,100,100);
-        }
-    })
+  const cnavasref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+   
+  
+      if(!cnavasref.current)  return
+      InitDraw(cnavasref.current);
+     
+  },[cnavasref]);
   return (
-    <div>page</div>
-  )
-}
+      <canvas ref={cnavasref}></canvas>
+  );
+};
 
-export default Canvas
+export default Canvas;
