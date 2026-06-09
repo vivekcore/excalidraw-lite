@@ -3,9 +3,14 @@ import { useEffect, useState } from 'react'
 import Canvas from './canvas'
 import { WS_URL } from '@/config';
 import { getToken } from '@/utils/token';
+import { useRouter } from 'next/navigation';
 
 const RoomCanvas = ({roomId}:{roomId:string}) => {
     const token = getToken()
+    const router = useRouter()
+    if(!token || token === "undefined"){
+        router.push("/sign-in")
+    }
     const [socket,setSocket] = useState<WebSocket | null>(null);
 
     useEffect(() => {

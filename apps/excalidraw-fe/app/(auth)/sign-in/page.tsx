@@ -1,6 +1,7 @@
 "use client";
 import { FeildValues } from "@/components/AuthForm";
 import { api } from "@/lib/axios";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 interface ISignin {
@@ -9,11 +10,12 @@ interface ISignin {
 }
 const SignIn = () => {
   const { register, handleSubmit } = useForm<ISignin>();
+  const router =  useRouter()
   const onSubmit = async (data: ISignin) => {
     try {
       const response = await api.post("/user/signin", data);
-      const token = response.data?.data.token as string;
-      localStorage.setItem("token", token);
+      localStorage.setItem("token",response.data.data)
+      router.push("/room")
     } catch (error) {
         console.log(error)
     }
@@ -33,6 +35,9 @@ const SignIn = () => {
           name="password"
           register={register}
         />
+        <button type="submit">
+          sign In
+        </button>
       </form>
     </div>
   );

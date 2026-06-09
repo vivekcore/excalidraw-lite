@@ -1,33 +1,27 @@
 import { api } from "@/lib/axios";
 
-type Shapes =
-  | {
-      type: "rect";
-      X: number;
-      Y: number;
-      width: number;
-      height: number;
-    }
-  | {
-      type: "circle";
-      centerX: number;
-      cneterY: number;
-      radius: number;
-    };
+type Shapes = {
+  type: "rect";
+  X: number;
+  Y: number;
+  width: number;
+  height: number;
+};
+
 
 export default async function InitDraw(
   canvas: HTMLCanvasElement,
   roomId: string,
   socket: WebSocket,
+  ctx: CanvasRenderingContext2D
 ) {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  // console.log(canvas)
   const existingShapes: Shapes[] = (await getShapes(roomId)) || [];
-  console.log(existingShapes);
+
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // ctx.fillStyle = "black";
+  // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   let clicked = false;
   let startX = 0;
@@ -37,6 +31,7 @@ export default async function InitDraw(
     const message = JSON.parse(e.data);
     if (message.type === "chat") {
       const parserShape = JSON.parse(message.message);
+      console.log(parserShape)
       existingShapes.push(parserShape);
       ClearCanvas(existingShapes, canvas, ctx);
     }
@@ -58,7 +53,7 @@ export default async function InitDraw(
       X: startX,
       Y: startY,
       height,
-      width,
+      width
     });
     socket.send(
       JSON.stringify({
@@ -69,7 +64,7 @@ export default async function InitDraw(
           X: startX,
           Y: startY,
           height,
-          width,
+          width
         }),
       }),
     );
@@ -96,7 +91,6 @@ export default async function InitDraw(
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ExShape.map((shape) => {
-
       if (shape.type === "rect") {
         ctx.strokeStyle = "yellow";
         ctx.strokeRect(shape.X, shape.Y, shape.width, shape.height);
@@ -108,9 +102,12 @@ export default async function InitDraw(
 async function getShapes(roomId: string) {
   try {
     const response = await api.get(`/room/chats/${roomId}`);
-    return response.data.data;
-  } catch (error) {
-    console.log(error);
+    const data = response.data.data as [];
+    const parse = data.map((e) => JSON.parse(e));
+    
+    return parse
+  } catch (error) { 
+    console.log(error)
     return [];
   }
 }
