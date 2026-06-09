@@ -1,4 +1,4 @@
-
+"use client"
 import React from 'react'
 import { FieldValues, UseFormRegister,Path  } from 'react-hook-form'
 interface IFeildValues<T extends FieldValues> {
@@ -13,7 +13,7 @@ export function FeildValues<T extends FieldValues>({label,name,register,type = "
   return (
     <div>
        <label htmlFor={name}>{label}</label>
-       <input type={type} id={name} {...register(name)} />
+       <input className='border' type={type} id={name} {...register(name)} />
     </div>
   )
 }

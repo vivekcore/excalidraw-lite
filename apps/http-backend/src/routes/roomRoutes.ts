@@ -46,9 +46,10 @@ router.get("/chats/:roomId", async (req: Request, res: Response) => {
       },
       take: 50,
     });
+    const messages = message.map((m) => {return m.message})
     res.status(200).json({
       status: "success",
-      data: message,
+      data: messages
     });
   } catch (error) {
     res.json({

@@ -33,9 +33,11 @@ router.post("/signup", async (req: Request, res: Response) => {
         email,
       }
     });
+    const payload = { userId: user?.id };
+    const token = jwt.sign(payload, JWT_SECRET);
     res.json({
       status: "success",
-      user,
+      data: {user,token}
     });
   } catch (error) {
     res.status(400).json({
@@ -69,8 +71,7 @@ router.post("/signin", async (req: Request, res: Response) => {
 
     res.json({
       status: "success",
-      message: "sign sucessfully",
-      token,
+      data: token
     });
   } catch (error) {
     res.status(400).json({
