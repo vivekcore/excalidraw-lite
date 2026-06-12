@@ -8,19 +8,26 @@ import { useRouter } from 'next/navigation';
 const RoomCanvas = ({roomId}:{roomId:string}) => {
     const token = getToken()
     const router = useRouter()
-    if(!token || token === "undefined"){
-        router.push("/sign-in")
-    }
     const [socket,setSocket] = useState<WebSocket | null>(null);
+
+    useEffect(() => {
+        if(!token || token === "undefined"){
+            router.push("./sign-in")
+            return
+        }
+    },[token, router])
 
     useEffect(() => {
         const ws = new WebSocket(`${WS_URL}?token=${token}`)
         ws.onopen = () => {
             setSocket(ws)
-            socket?.send(JSON.stringify({
+            ws.send(JSON.stringify({
                 type:"join_room",
                 roomId
             }))
+        }
+        return () => {
+            ws.close()
         }
     },[roomId,token])
     if(socket === null){

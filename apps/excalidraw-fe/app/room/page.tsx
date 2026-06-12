@@ -7,7 +7,7 @@ const Page = () => {
     const router = useRouter();
     const token = getToken()
     if(!token || token === "undefined"){
-        router.push("/sign-in")
+        router.push("sign-in")
     }
   return (
     <div>
