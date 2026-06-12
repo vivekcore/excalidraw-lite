@@ -42,10 +42,6 @@ wss.on("connection", function connection(ws, request) {
     return;
   }
 
-  const existing = users.filter((u) => u.userId === userId);
-  existing.forEach((u) => u.ws.close());
-  users = users.filter((u) => u.userId !== userId);
-
   users.push({
     ws,
     userId,
