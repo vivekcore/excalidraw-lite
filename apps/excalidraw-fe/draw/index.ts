@@ -14,7 +14,7 @@ export default async function InitDraw(
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  const existingShapes: Shapes[] = (await getShapes(roomId)) || [];
+  const existingShapes: Shapes[] = await getShapes(roomId);
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ClearCanvas(existingShapes, canvas, ctx);
   ctx.fillStyle = "black";
@@ -88,20 +88,36 @@ export default async function InitDraw(
         );
         break;
       case "triangle":
-        BroadCastTriangle(startX,startY,e.offsetX,e.offsetY,existingShapes,socket,roomId)
-      break;
-        default:
+        BroadCastTriangle(
+          startX,
+          startY,
+          e.offsetX,
+          e.offsetY,
+          existingShapes,
+          socket,
+          roomId,
+        );
+        break;
+      // case "pencil":
+      //BroadCastPencilDraw(startX,startY,e.offsetX,e.offsetY,ctx,existingShapes,socket,roomId)
+      //  break;
+      //   break;
+      default:
         break;
     }
-    ClearCanvas(existingShapes, canvas, ctx);
+    if (shapeKind.current !== "pencil") {
+      ClearCanvas(existingShapes, canvas, ctx);
+    }
   };
   const onMouseMove = (e: MouseEvent) => {
     if (!clicked) return;
 
     const width = e.offsetX - startX;
     const height = e.offsetY - startY;
+    if (shapeKind.current !== "pencil") {
+      ClearCanvas(existingShapes, canvas, ctx);
+    }
 
-    ClearCanvas(existingShapes, canvas, ctx);
     ctx.beginPath();
     ctx.strokeStyle = "yellow";
     switch (shapeKind.current) {
@@ -116,8 +132,21 @@ export default async function InitDraw(
         break;
       case "line":
         CreateLine(startX, startY, e.offsetX, e.offsetY, ctx);
+        break;
       case "triangle":
-        CreateTriangle(startX,startY,e.offsetX,e.offsetY,ctx)
+        CreateTriangle(startX, startY, e.offsetX, e.offsetY, ctx);
+        break;
+      case "pencil":
+        CreateWithPencil(
+          startX,
+          startY,
+          e.offsetX,
+          e.offsetY,
+          ctx,
+          existingShapes,
+        );
+        startX = e.offsetX;
+        startY = e.offsetY;
       default:
         break;
     }
@@ -141,6 +170,7 @@ function ClearCanvas(
   ctx: CanvasRenderingContext2D,
 ) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   ExShape.map((shape) => {
     ctx.strokeStyle = "yellow";
     ctx.beginPath();
@@ -168,10 +198,10 @@ function ClearCanvas(
         ctx.lineTo(shape.endX, shape.endY);
         break;
       case "triangle":
-        ctx.moveTo((shape.startX+shape.endX)/2,shape.startY)
-        ctx.lineTo(shape.startX,shape.endY)
-        ctx.lineTo(shape.endX,shape.endY)
-        ctx.closePath()
+        ctx.moveTo((shape.startX + shape.endX) / 2, shape.startY);
+        ctx.lineTo(shape.startX, shape.endY);
+        ctx.lineTo(shape.endX, shape.endY);
+        ctx.closePath();
         break;
       default:
         break;
@@ -232,17 +262,64 @@ function CreateLine(
   ctx.lineTo(endX, endY);
   ctx.stroke();
 }
-function CreateTriangle(x:number,y:number,endX:number,endY:number,ctx:CanvasRenderingContext2D){
-  ctx.beginPath()
-  ctx.moveTo((x+endX)/2,y)
-  ctx.lineTo(x,endY)
-  ctx.lineTo(endX,endY)
-  ctx.closePath()
-  ctx.stroke()
+function CreateTriangle(
+  x: number,
+  y: number,
+  endX: number,
+  endY: number,
+  ctx: CanvasRenderingContext2D,
+) {
+  ctx.moveTo((x + endX) / 2, y);
+  ctx.lineTo(x, endY);
+  ctx.lineTo(endX, endY);
+  ctx.closePath();
 }
+function CreateWithPencil(
+  x: number,
+  y: number,
+  endX: number,
+  endY: number,
+  ctx: CanvasRenderingContext2D,
+  // socket:WebSocket,
+  ExShapes: Shapes[],
+  // roomId: string
+) {
+  ctx.moveTo(x, y);
+  ctx.lineTo(endX, endY);
+  ctx.lineWidth = 2;
+  ctx.closePath();
 
-
+  ctx.stroke();
+  ExShapes.push({
+    type: "pencil",
+    startX: x,
+    startY: y,
+    endX,
+    endY,
+  });
+  //BroadCastPencilDraw(x,y,endX,endY,ctx,ExShapes,socket,roomId)
+}
 //Functions for sending shapes through websockets to database
+// function BroadCastPencilDraw(x:number,y:number,endX:number,endY:number,ctx:CanvasRenderingContext2D,ExShapes:Shapes[],socket:WebSocket,roomId:string){
+//   ExShapes.push({
+//     type:"pencil",
+//     startX:x,
+//     startY:y,
+//     endX,
+//     endY
+//   })
+//   socket.send(JSON.stringify({
+//     type:"chat",
+//     roomId,
+//     message:JSON.stringify({
+//       type:"pencil",
+//     startX:x,
+//     startY:y,
+//     endX,
+//     endY
+//     })
+//   }))
+// }
 function BroadCastCircle(
   x: number,
   y: number,
@@ -267,7 +344,7 @@ function BroadCastCircle(
         type: "circle",
         X: x,
         Y: y,
-        radius
+        radius,
       }),
     }),
   );
@@ -303,7 +380,7 @@ function BroadCastEllipse(
         centerX,
         centerY,
         radiusX,
-        radiusY
+        radiusY,
       }),
     }),
   );
@@ -333,7 +410,7 @@ function BroadCastRectangle(
         X: x,
         Y: y,
         height: h,
-        width: w
+        width: w,
       }),
     }),
   );
@@ -363,29 +440,38 @@ function BroadCastLine(
         startX: x,
         startY: y,
         endX,
-        endY
+        endY,
       }),
     }),
   );
 }
-function BroadCastTriangle(x:number,y:number,endX:number,endY:number,ExShapes:Shapes[],socket:WebSocket,roomId:string){
-
+function BroadCastTriangle(
+  x: number,
+  y: number,
+  endX: number,
+  endY: number,
+  ExShapes: Shapes[],
+  socket: WebSocket,
+  roomId: string,
+) {
   ExShapes.push({
-      type:"triangle",
-      startX:x,
-      startY:y,
-      endX,
-      endY,
-  })
-  socket.send(JSON.stringify({
-    type:"chat",
-    roomId,
-    message:JSON.stringify({
-      type:"triangle",
-      startX:x,
-      startY:y,
-      endX,
-      endY
-    })
-  }))
+    type: "triangle",
+    startX: x,
+    startY: y,
+    endX,
+    endY,
+  });
+  socket.send(
+    JSON.stringify({
+      type: "chat",
+      roomId,
+      message: JSON.stringify({
+        type: "triangle",
+        startX: x,
+        startY: y,
+        endX,
+        endY,
+      }),
+    }),
+  );
 }

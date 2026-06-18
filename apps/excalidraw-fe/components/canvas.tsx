@@ -9,11 +9,12 @@ import {
   MousePointer,
   Paintbrush,
   Copy,
-  Check
+  Check,
+  Pencil
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-export type Tshape = "circle" | "rectangle" | "ellipse" | "triangle" | "line" | null;
+export type Tshape ="circle" | "rectangle" | "ellipse" | "triangle" | "line" |"pencil"| null;
 
 export default function Canvas({
   roomId,
@@ -27,7 +28,10 @@ export default function Canvas({
   const [copied, setCopied] = useState(false);
 
   const shapeRef = useRef<Tshape>(null);
-  shapeRef.current = shape;
+  useEffect(() => {
+    shapeRef.current = shape;
+  },[shape])
+  
 
   useEffect(() => {
     if (cnavasref.current) {
@@ -97,6 +101,7 @@ export default function Canvas({
     { id: "ellipse", icon: Ellipse, label: "Ellipse (E / 4)" },
     { id: "triangle", icon: Triangle, label: "Triangle (T / 5)" },
     { id: "line", icon: Minus, label: "Line (L / 6)" },
+    {id : "pencil", icon: Pencil, label: "Pencil (p / 7)"}
   ] as const;
 
   return (
