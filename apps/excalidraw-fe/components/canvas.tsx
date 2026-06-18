@@ -113,7 +113,7 @@ export default function Canvas({
         
         {/* Left Section: Brand Logo & Title */}
         <div className="flex items-center gap-2.5 border-r border-zinc-800/80 pr-4 mr-1">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <div className="w-8 h-8 rounded-xl bg-linear-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
             <Paintbrush className="w-4 h-4 text-white animate-pulse" />
           </div>
           <div className="hidden md:flex flex-col">
@@ -138,7 +138,7 @@ export default function Canvas({
                   }`}
                   aria-label={tool.label}
                 >
-                  <IconComponent className="w-5 h-5 stroke-[2]" />
+                  <IconComponent className="w-5 h-5 stroke-2" />
                 </button>
                 
                 {/* Tooltip */}
