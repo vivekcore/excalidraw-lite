@@ -12,9 +12,10 @@ import {
   Check,
   Pencil
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Tshape } from "@/draw/types";
+import { Game } from "@/draw/Game";
 
-export type Tshape ="circle" | "rectangle" | "ellipse" | "triangle" | "line" |"pencil"| null;
 
 export default function Canvas({
   roomId,
@@ -24,10 +25,17 @@ export default function Canvas({
   socket: WebSocket;
 }) {
   const cnavasref = useRef<HTMLCanvasElement>(null);
+  
+  const [color,setColor] = useState<string>('#FFFF00')
+  const colorref = useRef<string>(color)
   const [shape, setShape] = useState<Tshape>(null);
   const [copied, setCopied] = useState(false);
-
   const shapeRef = useRef<Tshape>(null);
+
+  useEffect(() => {
+    colorref.current = color
+  },[color]) 
+
   useEffect(() => {
     shapeRef.current = shape;
   },[shape])
@@ -35,7 +43,9 @@ export default function Canvas({
 
   useEffect(() => {
     if (cnavasref.current) {
-      InitDraw(cnavasref.current, roomId, socket, shapeRef);
+     // InitDraw(cnavasref.current, roomId, socket, shapeRef,colorref);
+      const newGame = new Game(cnavasref.current,roomId,colorref, shapeRef,socket)
+      //newGame.destroy();
     }
   }, [roomId, socket]);
 
@@ -93,7 +103,10 @@ export default function Canvas({
       console.error("Failed to copy room ID: ", err);
     }
   };
-
+  const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const color = e.target.value
+    setColor(color)
+  }
   const tools = [
     { id: null, icon: MousePointer, label: "Select (V / 1)" },
     { id: "rectangle", icon: RectangleHorizontal, label: "Rectangle (R / 2)" },
@@ -107,11 +120,20 @@ export default function Canvas({
   return (
     <>
       <canvas className="relative bg-zinc-950 block w-full h-full" ref={cnavasref} />
-      
+
+    <div className="absolute w-40 bg-mauve-800  top-30 left-10 rounded-xl px-1">
+      <div className="flex items-center justify-around" >
+    <label className=" text-sm" htmlFor="color">Stroke </label>
+     <input onChange={handleChange} value={color} type="color"  id="color" />
+
+      </div>
+    </div>
+
       {/* Floating Modern Header */}
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center bg-zinc-900/90 backdrop-blur-md border border-zinc-800/80 px-4 py-2 rounded-2xl shadow-[0_12px_40px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-zinc-700/80">
         
         {/* Left Section: Brand Logo & Title */}
+
         <div className="flex items-center gap-2.5 border-r border-zinc-800/80 pr-4 mr-1">
           <div className="w-8 h-8 rounded-xl bg-linear-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
             <Paintbrush className="w-4 h-4 text-white animate-pulse" />
