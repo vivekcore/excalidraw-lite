@@ -1,4 +1,4 @@
-import { Tshape } from "@/components/canvas";
+import { Tshape } from "./types";
 import { api } from "@/lib/axios";
 import { Shapes } from "./types";
 
@@ -7,6 +7,7 @@ export default async function InitDraw(
   roomId: string,
   socket: WebSocket,
   shapeKind: { current: Tshape },
+  strokeColor: {current: string}
 ) {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -18,6 +19,7 @@ export default async function InitDraw(
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ClearCanvas(existingShapes, canvas, ctx);
   ctx.fillStyle = "black";
+  ctx.strokeStyle = strokeColor.current;
 
   let clicked = false;
   let startX = 0;
@@ -52,6 +54,7 @@ export default async function InitDraw(
           existingShapes,
           socket,
           roomId,
+          strokeColor.current
         );
         break;
       case "circle":
@@ -63,6 +66,8 @@ export default async function InitDraw(
           existingShapes,
           socket,
           roomId,
+          strokeColor.current
+
         );
         break;
       case "ellipse":
@@ -74,6 +79,8 @@ export default async function InitDraw(
           existingShapes,
           socket,
           roomId,
+          strokeColor.current
+
         );
         break;
       case "line":
@@ -85,6 +92,8 @@ export default async function InitDraw(
           existingShapes,
           roomId,
           socket,
+          strokeColor.current
+
         );
         break;
       case "triangle":
@@ -96,6 +105,8 @@ export default async function InitDraw(
           existingShapes,
           socket,
           roomId,
+          strokeColor.current
+
         );
         break;
       // case "pencil":
@@ -119,7 +130,6 @@ export default async function InitDraw(
     }
 
     ctx.beginPath();
-    ctx.strokeStyle = "yellow";
     switch (shapeKind.current) {
       case "rectangle":
         ctx.strokeRect(startX, startY, width, height);
@@ -144,6 +154,7 @@ export default async function InitDraw(
           e.offsetY,
           ctx,
           existingShapes,
+          strokeColor.current
         );
         startX = e.offsetX;
         startY = e.offsetY;
@@ -172,17 +183,19 @@ function ClearCanvas(
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   ExShape.map((shape) => {
-    ctx.strokeStyle = "yellow";
     ctx.beginPath();
 
     switch (shape.type) {
       case "rectangle":
+        ctx.strokeStyle = shape.strokeColor
         ctx.strokeRect(shape.X, shape.Y, shape.width, shape.height);
         break;
       case "circle":
+        ctx.strokeStyle = shape.strokeColor
         ctx.arc(shape.X, shape.Y, shape.radius, 0, Math.PI * 2);
         break;
       case "ellipse":
+        ctx.strokeStyle = shape.strokeColor
         ctx.ellipse(
           shape.centerX,
           shape.centerY,
@@ -194,10 +207,12 @@ function ClearCanvas(
         );
         break;
       case "line":
+        ctx.strokeStyle = shape.strokeColor
         ctx.moveTo(shape.startX, shape.startY);
         ctx.lineTo(shape.endX, shape.endY);
         break;
       case "triangle":
+        ctx.strokeStyle = shape.strokeColor
         ctx.moveTo((shape.startX + shape.endX) / 2, shape.startY);
         ctx.lineTo(shape.startX, shape.endY);
         ctx.lineTo(shape.endX, shape.endY);
@@ -212,7 +227,7 @@ function ClearCanvas(
 }
 
 //Extracting exesting shapes from database
-async function getShapes(roomId: string) {
+ async function getShapes(roomId: string) {
   try {
     const response = await api.get(`/room/chats/${roomId}`);
     const data = response.data.data as [];
@@ -283,6 +298,7 @@ function CreateWithPencil(
   // socket:WebSocket,
   ExShapes: Shapes[],
   // roomId: string
+  color:string
 ) {
   ctx.moveTo(x, y);
   ctx.lineTo(endX, endY);
@@ -296,6 +312,8 @@ function CreateWithPencil(
     startY: y,
     endX,
     endY,
+    strokeColor:color
+
   });
   //BroadCastPencilDraw(x,y,endX,endY,ctx,ExShapes,socket,roomId)
 }
@@ -328,6 +346,7 @@ function BroadCastCircle(
   ExShapes: Shapes[],
   socket: WebSocket,
   roomId: string,
+  color:string
 ) {
   const radius = Math.sqrt(w * w + h * h);
   ExShapes.push({
@@ -335,6 +354,7 @@ function BroadCastCircle(
     X: x,
     Y: y,
     radius,
+    strokeColor:color,
   });
   socket.send(
     JSON.stringify({
@@ -345,6 +365,7 @@ function BroadCastCircle(
         X: x,
         Y: y,
         radius,
+        strokeColor:color,
       }),
     }),
   );
@@ -357,6 +378,7 @@ function BroadCastEllipse(
   ExShapes: Shapes[],
   socket: WebSocket,
   roomId: string,
+  color:string
 ) {
   const centerX = x + w / 2;
   const centerY = y + h / 2;
@@ -370,6 +392,7 @@ function BroadCastEllipse(
     centerY,
     radiusX,
     radiusY,
+    strokeColor:color,
   });
   socket.send(
     JSON.stringify({
@@ -381,6 +404,7 @@ function BroadCastEllipse(
         centerY,
         radiusX,
         radiusY,
+        strokeColor:color,
       }),
     }),
   );
@@ -393,6 +417,7 @@ function BroadCastRectangle(
   ExShapes: Shapes[],
   socket: WebSocket,
   roomId: string,
+  color:string
 ) {
   ExShapes.push({
     type: "rectangle",
@@ -400,6 +425,7 @@ function BroadCastRectangle(
     Y: y,
     width: w,
     height: h,
+    strokeColor:color,
   });
   socket.send(
     JSON.stringify({
@@ -411,6 +437,7 @@ function BroadCastRectangle(
         Y: y,
         height: h,
         width: w,
+        strokeColor:color,
       }),
     }),
   );
@@ -423,6 +450,7 @@ function BroadCastLine(
   ExShapes: Shapes[],
   roomId: string,
   socket: WebSocket,
+  color:string
 ) {
   ExShapes.push({
     type: "line",
@@ -430,6 +458,7 @@ function BroadCastLine(
     startY: y,
     endX,
     endY,
+    strokeColor:color,
   });
   socket.send(
     JSON.stringify({
@@ -441,6 +470,7 @@ function BroadCastLine(
         startY: y,
         endX,
         endY,
+        strokeColor:color,
       }),
     }),
   );
@@ -453,6 +483,7 @@ function BroadCastTriangle(
   ExShapes: Shapes[],
   socket: WebSocket,
   roomId: string,
+  color:string
 ) {
   ExShapes.push({
     type: "triangle",
@@ -460,6 +491,7 @@ function BroadCastTriangle(
     startY: y,
     endX,
     endY,
+    strokeColor:color,
   });
   socket.send(
     JSON.stringify({
@@ -471,6 +503,7 @@ function BroadCastTriangle(
         startY: y,
         endX,
         endY,
+        strokeColor:color,
       }),
     }),
   );

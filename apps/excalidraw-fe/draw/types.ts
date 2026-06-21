@@ -1,3 +1,5 @@
+export type Tshape ="circle" | "rectangle" | "ellipse" | "triangle" | "line" |"pencil"| null;
+
 export type Shapes =
   | {
       type: "rectangle";
@@ -5,12 +7,14 @@ export type Shapes =
       Y: number;
       width: number;
       height: number;
+      strokeColor:string
     }
   | {
       type: "circle";
       X: number;
       Y: number;
       radius: number;
+      strokeColor:string
     }
   | {
       type: "ellipse";
@@ -18,6 +22,7 @@ export type Shapes =
       centerY: number;
       radiusX: number;
       radiusY: number;
+      strokeColor:string
     }
   | {
       type: "line";
@@ -25,6 +30,7 @@ export type Shapes =
       startY: number;
       endX: number;
       endY: number;
+      strokeColor:string
     }
   | {
       type: "triangle";
@@ -32,6 +38,7 @@ export type Shapes =
       startY: number;
       endX: number;
       endY: number;
+      strokeColor:string
     }
   | {
       type: "pencil";
@@ -39,4 +46,5 @@ export type Shapes =
       startY: number;
       endX: number;
       endY: number;
+      strokeColor:string
     };
