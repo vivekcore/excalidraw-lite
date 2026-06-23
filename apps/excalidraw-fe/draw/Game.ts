@@ -1,5 +1,5 @@
 import { api } from "@/lib/axios";
-import { Shapes } from "./types";
+import {  Shapes } from "./types";
 import { Tshape } from "./types";
 
 export class Game {
@@ -26,6 +26,7 @@ export class Game {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.existingShapes = [];
+    this.existingPencilDrawing = [];
     this.roomId = roomId;
     this.strokeColor = strokeColor;
     this.shapeKind = shapeKind;
@@ -36,22 +37,20 @@ export class Game {
     this.init();
     this.initMouseEvents();
   }
-//  public destroy() {
-//     this.canvas.removeEventListener("mousedown", this.onMouseDown);
-//     this.canvas.removeEventListener("mousemove", this.onMouseMove);
-//     this.canvas.removeEventListener("mouseup", this.onMouseUp);
-//     this.socket.close();
-//   }
+  //  public destroy() {
+  //     this.canvas.removeEventListener("mousedown", this.onMouseDown);
+  //     this.canvas.removeEventListener("mousemove", this.onMouseMove);
+  //     this.canvas.removeEventListener("mouseup", this.onMouseUp);
+  //     this.socket.close();
+  //   }
   async init() {
-    console.log("initilized")
+    console.log("initilized");
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     if (!this.ctx) return;
-
     this.existingShapes = await this.getShapes();
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillStyle = "black";
-    this.ctx.strokeStyle = this.strokeColor.current;
     this.ClearCanvas();
   }
   ClearCanvas() {
@@ -59,10 +58,10 @@ export class Game {
     this.existingShapes.forEach((shape) => {
       this.drawShapes(shape);
     });
+    
   }
   drawShapes(shape: Shapes) {
     this.ctx.beginPath();
-
     switch (shape.type) {
       case "rectangle":
         this.ctx.strokeStyle = shape.strokeColor;
@@ -105,7 +104,7 @@ export class Game {
     try {
       const response = await api.get(`/room/chats/${this.roomId}`);
       const data = response.data.data as [];
-      const parse:Shapes[] = data.map((e) => JSON.parse(e));
+      const parse: Shapes[] = data.map((e) => JSON.parse(e));
 
       return parse;
     } catch (error) {
@@ -113,31 +112,32 @@ export class Game {
       return [];
     }
   }
+
+
   initMouseEvents() {
     this.canvas.addEventListener("mouseup", this.onMouseUp);
     this.canvas.addEventListener("mousedown", this.onMouseDown);
     this.canvas.addEventListener("mousemove", this.onMouseMove);
 
-  return () => {
-    this.canvas.removeEventListener("mouseup", this.onMouseDown);
-    this.canvas.removeEventListener("mousemove", this.onMouseMove);
-    this.canvas.removeEventListener("mouseleave", this.onMouseUp);
-    this.socket.close();
-  }
+    return () => {
+      this.canvas.removeEventListener("mouseup", this.onMouseDown);
+      this.canvas.removeEventListener("mousemove", this.onMouseMove);
+      this.canvas.removeEventListener("mouseleave", this.onMouseUp);
+      this.socket.close();
+    };
   }
 
   private onMouseDown = (e: MouseEvent) => {
-    console.log("mosue down")
     this.clicked = true;
+    this.ctx.strokeStyle = this.strokeColor.current;
     this.startX = e.offsetX;
     this.startY = e.offsetY;
   };
   private onMouseUp = (e: MouseEvent) => {
-    
     this.clicked = false;
     const width = e.offsetX - this.startX;
     const height = e.offsetY - this.startY;
-
+    this.ctx.strokeStyle = this.strokeColor.current;
     switch (this.shapeKind.current) {
       case "rectangle":
         this.BroadCastRectangle(width, height);
@@ -160,16 +160,15 @@ export class Game {
     if (this.shapeKind.current !== "pencil") {
       this.ClearCanvas();
     }
-    console.log("mosue up")
+    console.log("mosue up");
   };
   private onMouseMove = (e: MouseEvent) => {
-    
     if (this.clicked === false) return;
     const width = e.offsetX - this.startX;
     const height = e.offsetY - this.startY;
-    if (this.shapeKind.current !== "pencil") {
-      this.ClearCanvas();
-    }
+    if (this.shapeKind.current !== "pencil") this.ClearCanvas();
+
+    this.ctx.strokeStyle = this.strokeColor.current;
     this.ctx.beginPath();
     switch (this.shapeKind.current) {
       case "rectangle":
@@ -195,7 +194,7 @@ export class Game {
         break;
     }
     this.ctx.stroke();
-    console.log("mosue move")
+    console.log("mosue move");
   };
 
   CreateCircle(width: number, height: number) {
@@ -224,9 +223,10 @@ export class Game {
   CreateWithPencil(offsetX: number, offsetY: number) {
     this.ctx.moveTo(this.startX, this.startY);
     this.ctx.lineTo(offsetX, offsetY);
-    this.ctx.lineWidth = 2;
+    this.ctx.lineWidth = 3;
     this.ctx.lineCap = "round";
     this.ctx.lineJoin = "round";
+   
   }
 
   BroadCastRectangle(width: number, height: number) {

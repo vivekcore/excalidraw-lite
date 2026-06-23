@@ -44,7 +44,7 @@ export default function Canvas({
   useEffect(() => {
     if (cnavasref.current) {
      // InitDraw(cnavasref.current, roomId, socket, shapeRef,colorref);
-      const newGame = new Game(cnavasref.current,roomId,colorref, shapeRef,socket)
+      new Game(cnavasref.current,roomId,colorref, shapeRef,socket)
       //newGame.destroy();
     }
   }, [roomId, socket]);
