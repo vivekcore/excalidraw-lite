@@ -80,7 +80,9 @@ wss.on("connection", function connection(ws, request) {
           },
         });
         users.forEach((user) => {
+          console.log('inside foreach')
           if (user.room.includes(parseData.roomId) && ws !== user.ws) {
+            console.log('broadcasting')
             user.ws.send(
               JSON.stringify({
                 type: "chat",
