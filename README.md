@@ -4,7 +4,7 @@
 </picture>
 
 <div align="center">
-  <h1>Excalidraw Clone</h1>
+  <h1>Excalidraw Lite</h1>
   <p><strong>Real-time collaborative whiteboard</strong></p>
 
   <p>
