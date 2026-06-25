@@ -10,13 +10,6 @@ export type Shapes =
       strokeColor:string
     }
   | {
-      type: "circle";
-      X: number;
-      Y: number;
-      radius: number;
-      strokeColor:string
-    }
-  | {
       type: "ellipse";
       centerX: number;
       centerY: number;

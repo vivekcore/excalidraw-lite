@@ -1,5 +1,5 @@
 import { api } from "@/lib/axios";
-import {  Shapes } from "./types";
+import { Shapes } from "./types";
 import { Tshape } from "./types";
 
 export class Game {
@@ -26,7 +26,6 @@ export class Game {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.existingShapes = [];
-    this.existingPencilDrawing = [];
     this.roomId = roomId;
     this.strokeColor = strokeColor;
     this.shapeKind = shapeKind;
@@ -36,13 +35,18 @@ export class Game {
     this.startY = startY;
     this.init();
     this.initMouseEvents();
+    this.socketMessage();
   }
-  //  public destroy() {
-  //     this.canvas.removeEventListener("mousedown", this.onMouseDown);
-  //     this.canvas.removeEventListener("mousemove", this.onMouseMove);
-  //     this.canvas.removeEventListener("mouseup", this.onMouseUp);
-  //     this.socket.close();
-  //   }
+  socketMessage() {
+    this.socket.onmessage = (e) => {
+      const message = JSON.parse(e.data);
+      if (message.type === "chat") {
+        const parserShape = JSON.parse(message.message);
+        this.existingShapes.push(parserShape);
+        this.ClearCanvas();
+      }
+    };
+  }
   async init() {
     console.log("initilized");
     this.canvas.width = window.innerWidth;
@@ -58,7 +62,6 @@ export class Game {
     this.existingShapes.forEach((shape) => {
       this.drawShapes(shape);
     });
-    
   }
   drawShapes(shape: Shapes) {
     this.ctx.beginPath();
@@ -66,10 +69,6 @@ export class Game {
       case "rectangle":
         this.ctx.strokeStyle = shape.strokeColor;
         this.ctx.strokeRect(shape.X, shape.Y, shape.width, shape.height);
-        break;
-      case "circle":
-        this.ctx.strokeStyle = shape.strokeColor;
-        this.ctx.arc(shape.X, shape.Y, shape.radius, 0, Math.PI * 2);
         break;
       case "ellipse":
         this.ctx.strokeStyle = shape.strokeColor;
@@ -113,7 +112,6 @@ export class Game {
     }
   }
 
-
   initMouseEvents() {
     this.canvas.addEventListener("mouseup", this.onMouseUp);
     this.canvas.addEventListener("mousedown", this.onMouseDown);
@@ -123,7 +121,6 @@ export class Game {
       this.canvas.removeEventListener("mouseup", this.onMouseDown);
       this.canvas.removeEventListener("mousemove", this.onMouseMove);
       this.canvas.removeEventListener("mouseleave", this.onMouseUp);
-      this.socket.close();
     };
   }
 
@@ -141,9 +138,6 @@ export class Game {
     switch (this.shapeKind.current) {
       case "rectangle":
         this.BroadCastRectangle(width, height);
-        break;
-      case "circle":
-        this.BroadCastCircle(width, height);
         break;
       case "ellipse":
         this.BroadCastEllipse(width, height);
@@ -226,7 +220,6 @@ export class Game {
     this.ctx.lineWidth = 3;
     this.ctx.lineCap = "round";
     this.ctx.lineJoin = "round";
-   
   }
 
   BroadCastRectangle(width: number, height: number) {
@@ -247,24 +240,7 @@ export class Game {
       }),
     );
   }
-  BroadCastCircle(width: number, height: number) {
-    const radius = Math.sqrt(width * width + height * height);
-    const shape: Shapes = {
-      type: "circle",
-      radius,
-      X: this.startX,
-      Y: this.startY,
-      strokeColor: this.strokeColor.current,
-    };
-    this.existingShapes.push(shape);
-    this.socket.send(
-      JSON.stringify({
-        type: "chat",
-        roomId: this.roomId,
-        message: JSON.stringify(shape),
-      }),
-    );
-  }
+
   BroadCastEllipse(width: number, height: number) {
     const centerX = this.startX + width / 2;
     const centerY = this.startY + height / 2;
