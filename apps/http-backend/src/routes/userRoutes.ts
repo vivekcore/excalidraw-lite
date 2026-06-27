@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import jwt from "jsonwebtoken";
-import { CreateUserSchema, SignSchema } from "@repo/common/types";
+import { userSignup, userSignin } from "@repo/common/types";
 import { prisma } from "@repo/db/prisma";
 import { Middleware } from "../middleware/userrMiddleware.js";
 const router: Router = Router();
@@ -9,7 +9,7 @@ const router: Router = Router();
 router.post("/signup", async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const response = CreateUserSchema.safeParse(data);
+    const response = userSignup.safeParse(data);
     if (!response.success) {
       return res.json({
         message: "Incorrect inputs",
@@ -48,7 +48,7 @@ router.post("/signup", async (req: Request, res: Response) => {
 
 router.post("/signin", async (req: Request, res: Response) => {
   try {
-    const response = SignSchema.safeParse(req.body);
+    const response = userSignin.safeParse(req.body);
     if (!response.success) {
       return res.status(403).json({
         messaage: "Invalid inputs",

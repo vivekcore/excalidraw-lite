@@ -2,6 +2,7 @@
 class RoomServices {
 
    async createRoom(userId:string,name:string){
+    
 
    }
    async updateRoom(userId:string,name:string){
