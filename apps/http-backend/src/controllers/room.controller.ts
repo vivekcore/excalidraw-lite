@@ -6,7 +6,7 @@ export const roomController = {
   createRoom: catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
       const userId = req.userId;
-      const name = req.body.name;
+      const name = req.body.name || 'Untitled';
       const response = await roomServices.createRoom(userId, name);
 
       res.status(200).json({
@@ -20,7 +20,8 @@ export const roomController = {
     async (req: Request, res: Response, next: NextFunction) => {
       const userId = req.userId;
       const name = req.body.name;
-      const response = await roomServices.updateRoom(userId, name);
+      const roomId = Number( req.body.roomId)
+      const response = await roomServices.updateRoom(userId, name,roomId);
 
       res.status(200).json({
         status: "success",
@@ -31,7 +32,8 @@ export const roomController = {
   ),
   deleteRoom: catchAsync(async(req:Request,res:Response,next:NextFunction) => {
     const userId = req.userId
-    const response = await roomServices.deleteRoom(userId)
+    const roomId = Number( req.body.roomId)
+    const response = await roomServices.deleteRoom(userId,roomId)
 
     res.status(200).json({
         status:"success",
