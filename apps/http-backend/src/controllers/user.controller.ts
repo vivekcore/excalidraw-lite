@@ -27,19 +27,19 @@ export const userController = {
       });
     },
   ),
-  UpdateUser: catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
-      const data = req.body;
-      const userId = req.userId;
-      const response = await userServices.UpdateUser(data, userId);
+  // UpdateUser: catchAsync(
+  //   async (req: Request, res: Response, next: NextFunction) => {
+  //     const data = req.body;
+  //     const userId = req.userId;
+  //     const response = await userServices.UpdateUser(data, userId);
 
-      res.status(200).json({
-        status: "success",
-        message: "Loged In",
-        data: response,
-      });
-    },
-  ),
+  //     res.status(200).json({
+  //       status: "success",
+  //       message: "Loged In",
+  //       data: response,
+  //     });
+  //   },
+  // ),
   DeleteUser: catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
       const userId = req.userId;
