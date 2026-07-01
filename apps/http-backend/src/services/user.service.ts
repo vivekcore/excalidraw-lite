@@ -72,27 +72,6 @@ class UserServices {
       token,
     };
   }
-  // async UpdateUser(data: any, userId: string) {
-  //   const parse = userUpdata.safeParse(data);
-  //   if (!parse.success) {
-  //     return;
-  //   }
-  //   let userD;
-  //   if (parse.data.email || parse.data.password || parse.data.name) {
-  //     userD = parse.data;
-  //   }
-  //   if (!userD) {
-  //     return;
-  //   }
-  //   //need to fix
-  // //   const resposne = await prisma.user.update({
-  // //     where: { id: userId },
-  // //     data: {
-  // //       ...userD,
-  // //     },
-  // //   });
-  // }
-
   async DeleteUser(userId: string) {
     const response = await prisma.user.delete({
       where: {
@@ -107,6 +86,7 @@ class UserServices {
       },
     };
   }
+
 }
 
 export const userServices = new UserServices();

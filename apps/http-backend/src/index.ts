@@ -1,7 +1,8 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
 import rootRouter from "./routes/index.js";
-import cors from "cors"
+import cors from "cors";
+import { errorHandler } from "./middleware/globalErrorMiddleware.js";
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -13,12 +14,12 @@ const startServer = () => {
         message: "http baackend is running",
       });
     });
-
+    app.use(errorHandler);
     app.listen(8000, () => {
       console.log("server is runnig at port 8000");
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 startServer();

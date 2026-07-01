@@ -1,6 +1,7 @@
 import { prisma } from "@repo/db";
 import { z } from "zod";
 import { GenerateSlug } from "../utils/slug.js";
+import ApiError from "../utils/ApiError.js";
 class RoomServices {
   async createRoom(userId: string, name: string) {
     const zodSchema = z.object({
@@ -8,6 +9,7 @@ class RoomServices {
     });
     const parse = zodSchema.safeParse({ Name: name });
     if (!parse.success) {
+      throw new ApiError(400,"Validation Error")
       return;
     }
     const slug = GenerateSlug();
@@ -19,14 +21,7 @@ class RoomServices {
         adminId: userId,
       },
     });
-    return {
-      room: {
-        userId,
-        roomId: data.id,
-        slug: data.slug,
-        name: data.name,
-      },
-    };
+    return data;
   }
   async updateRoom(userId: string, name: string, roomId: number) {
     const zodSchema = z.object({
@@ -47,14 +42,7 @@ class RoomServices {
       },
     });
 
-    return {
-      room: {
-        userId,
-        roomId: data.id,
-        slug: data.slug,
-        name: data.name,
-      },
-    };
+    return data;
   }
   async deleteRoom(userId: string, roomId: number) {
     const data = await prisma.room.delete({
@@ -66,14 +54,40 @@ class RoomServices {
     if (!data) {
       return;
     }
-    return {
-      room: {
+    return data;
+  }
+  async myRooms(useId:string){
+    const data = await prisma.room.findMany({
+      where:{
+        adminId:useId
+      }
+    })
+    
+    return data
+  }
+  async getChatByRoomId(userId: string, roomId: number) {
+    const data = await prisma.chat.findFirst({
+      where: {
+        roomId,
         userId,
-        roomId: data.id,
-        slug: data.slug,
-        name: data.name,
       },
-    };
+    });
+
+    return data;
+  }
+
+  async getRoomBySlug(userId: string, slug: string) {
+    const data = await prisma.room.findFirst({
+      where: {
+        slug,
+        userId,
+      },
+    });
+    if (!data) {
+      console.log("room not found");
+      return;
+    }
+    return data;
   }
 }
 
