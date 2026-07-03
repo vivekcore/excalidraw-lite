@@ -31,19 +31,22 @@ const checkUser = (token: string): string | null => {
 wss.on("connection", function connection(ws, request) {
   ws.on("error", console.error);
 
-
   ws.on("close", () => {
     users = users.filter((u) => u.ws !== ws);
   });
 
   ws.on("message", async (data) => {
     try {
-      let userId;
       const parseData = JSON.parse(data as unknown as string);
+
+      if (!(ws as any).userId && parseData.type !== "auth") {
+        ws.close();
+        return;
+      }
       if (parseData.type === "auth") {
         const token = parseData.token;
         const user = checkUser(token);
-        userId = user;
+        (ws as any).userId = user;
         if (!user || user === null) {
           ws.close();
           return;
@@ -54,10 +57,7 @@ wss.on("connection", function connection(ws, request) {
           room: [],
         });
       }
-      if (!userId || userId === null) {
-        ws.close();
-        return;
-      }
+
       if (parseData.type === "join_room") {
         const user = users.find((x) => x.ws === ws);
         user?.room.push(parseData.roomId);
@@ -79,7 +79,7 @@ wss.on("connection", function connection(ws, request) {
           data: {
             message,
             roomId,
-            userId,
+            userId: (ws as any).userId,
           },
         });
         users.forEach((user) => {
@@ -100,16 +100,3 @@ wss.on("connection", function connection(ws, request) {
   });
 });
 
-
-  // const url = request.url;
-  // if (!url) {
-  //   return;
-  // }
-  // const queryParams = new URLSearchParams(url.split("?")[1]);
-  // const token = queryParams.get("token") || "";
-  // const userId = checkUser(token);
-
-  // if (!userId || userId === null) {
-  //   ws.close();
-  //   return;
-  // }
