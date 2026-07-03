@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../utils/AsyncApi.js";
-import { userServices } from "../services/user.service.js";
+import { userServices } from "../services/auth.services.js";
 
 export const userController = {
   SignupUser: catchAsync(

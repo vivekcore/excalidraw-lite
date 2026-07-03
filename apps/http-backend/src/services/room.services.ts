@@ -1,7 +1,7 @@
 import { prisma } from "@repo/db";
 import { z } from "zod";
 import { GenerateSlug } from "../utils/slug.js";
-import ApiError from "../utils/ApiError.js";
+import { ValidationError, NotFoundError } from "@repo/db/error";
 class RoomServices {
   async createRoom(userId: string, name: string) {
     const zodSchema = z.object({
@@ -9,8 +9,7 @@ class RoomServices {
     });
     const parse = zodSchema.safeParse({ Name: name });
     if (!parse.success) {
-      throw new ApiError(400,"Validation Error")
-      return;
+      throw new ValidationError("Validation Error", parse.error);
     }
     const slug = GenerateSlug();
     const { Name } = parse.data;
@@ -29,7 +28,7 @@ class RoomServices {
     });
     const parse = zodSchema.safeParse({ Name: name });
     if (!parse.success) {
-      return;
+      throw new ValidationError("Invalid room name", parse.error);
     }
     const { Name } = parse.data;
     const data = await prisma.room.update({
@@ -52,7 +51,7 @@ class RoomServices {
       },
     });
     if (!data) {
-      return;
+      throw new NotFoundError("Room not found");
     }
     return data;
   }
@@ -69,7 +68,6 @@ class RoomServices {
     const data = await prisma.chat.findFirst({
       where: {
         roomId,
-        userId,
       },
     });
 
@@ -79,13 +77,11 @@ class RoomServices {
   async getRoomBySlug(userId: string, slug: string) {
     const data = await prisma.room.findFirst({
       where: {
-        slug,
-        userId,
+        slug
       },
     });
     if (!data) {
-      console.log("room not found");
-      return;
+      throw new NotFoundError("Room not found");
     }
     return data;
   }
