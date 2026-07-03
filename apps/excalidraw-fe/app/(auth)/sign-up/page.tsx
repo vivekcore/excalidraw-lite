@@ -22,7 +22,7 @@ const SignUp = () => {
   const { register, handleSubmit } = useForm<ISignUp>();
   const onSubmit = async (data: ISignUp) => {
     try {
-      const response = await api.post("/user/signup", data);
+      const response = await api.post("/auth/signup", data);
       localStorage.setItem("token", response.data.data.token);
       router.push("/room");
     } catch (error) {

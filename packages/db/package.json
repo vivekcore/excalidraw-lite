@@ -10,7 +10,10 @@
   },
   "exports": {
     ".": "./dist/lib/prisma.js",
-    "./prisma": "./dist/lib/prisma.js"
+    "./prisma": "./dist/lib/prisma.js",
+    "./error":  "./dist/lib/errors.js",
+    "./prismaClient": "./dist/generated/prisma/client.js"
+    
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
