@@ -2,8 +2,8 @@ import { userSignin, userSignup } from "@repo/common/types";
 import { prisma } from "@repo/db";
 import { ValidationError, ConflictError, UnauthorizedError } from "@repo/db/error";
 import Jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config.js";
-
+import { JWT_SECRET, SALT_ROUNDS } from "../config.js";
+import bcrypt from "bcrypt"
 class UserServices {
   async SignupUser(data: any) {
     const parse = userSignup.safeParse(data);
@@ -19,23 +19,18 @@ class UserServices {
     if (existingU) {
       throw new ConflictError("User already exists");
     }
+    const hashed = await bcrypt.hash(password,SALT_ROUNDS)
     const response = await prisma.user.create({
       data: {
         name,
         email,
-        password,
+        password:hashed
       },
     });
     const payload = { userId: response.id };
     const token = Jwt.sign(payload, JWT_SECRET);
     return {
-      user: {
-        id: response.id,
-        name: response.name,
-        email: response.email,
-        image: response.image,
-        createdAt: response.createdAt,
-      },
+      user:response,
       token,
     };
   }
@@ -49,24 +44,20 @@ class UserServices {
     const response = await prisma.user.findFirst({
       where: {
         email,
-        password,
       },
     });
     if (!response) {
-      throw new UnauthorizedError("Invalid email or password");
+      throw new UnauthorizedError("Invalid email");
+    }
+    const match = await bcrypt.compare(password, response.password);
+    if(!match){
+      throw new UnauthorizedError("wrong password");
     }
     const payload = { userId: response.id };
     const token = Jwt.sign(payload, JWT_SECRET);
 
     return {
-      user: {
-        id: response.id,
-        name: response.name,
-        email: response.email,
-        image: response.image,
-        createdAt: response.createdAt,
-        updatedAt: response.updatedAt,
-      },
+      user:response,
       token,
     };
   }
@@ -77,11 +68,7 @@ class UserServices {
       },
     });
     return {
-      user: {
-        id: response.id,
-        name: response.name,
-        email: response.email,
-      },
+      user: response
     };
   }
 

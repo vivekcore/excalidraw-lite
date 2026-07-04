@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Middleware } from "../middleware/userrMiddleware.js";
+import { Middleware } from "../middleware/authMiddleware.js";
 import { roomController } from "../controllers/room.controller.js";
 const router: Router = Router();
 
@@ -9,4 +9,5 @@ router.patch("/update",Middleware,roomController.updateRoom)
 router.get("/chats/:roomId",Middleware,roomController.getChatByRoomId);
 router.get("/my-rooms",Middleware,roomController.myRooms)
 router.get("/room/:slug",Middleware,roomController.getRoombySlug)
+router.get("/room/shapes/:roomId",Middleware,roomController.getRoomShapes)
 export default router;

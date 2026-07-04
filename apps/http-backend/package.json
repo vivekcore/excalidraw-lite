@@ -10,7 +10,6 @@
     "dev": "pnpm build && pnpm start"
   },
   "devDependencies": {
-    "@repo/backend-common": "workspace:*",
     "@repo/common": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/typescript-config": "workspace:*",
@@ -19,6 +18,8 @@
     "@types/jsonwebtoken": "^9.0.10"
   },
   "dependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

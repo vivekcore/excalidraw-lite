@@ -65,10 +65,13 @@ class RoomServices {
     return data
   }
   async getChatByRoomId(userId: string, roomId: number) {
-    const data = await prisma.chat.findFirst({
+    const data = await prisma.chat.findMany({
       where: {
         roomId,
       },
+      orderBy: {
+        createdAt: "desc"
+      }
     });
 
     return data;
@@ -84,6 +87,16 @@ class RoomServices {
       throw new NotFoundError("Room not found");
     }
     return data;
+  }
+  async getRoomShapes(roomId: number){
+
+    const data = await prisma.shape.findMany({
+      where:{
+        roomId,
+      }
+    })
+   
+    return data
   }
 }
 

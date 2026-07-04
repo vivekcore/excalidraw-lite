@@ -72,4 +72,14 @@ export const roomController = {
         data:response
     })
   } ),
+  getRoomShapes: catchAsync(async(req:Request,res:Response,next:NextFunction)=> {
+    const roomId =Number(req.params.roomId)
+
+    const response = await roomServices.getRoomShapes(roomId)
+    res.status(200).json({
+        status:"success",
+        message:"Room shapes",
+        data:response
+    })
+  })
 }
