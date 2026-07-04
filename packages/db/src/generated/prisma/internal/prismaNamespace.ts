@@ -386,7 +386,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Chat: 'Chat',
-  Room: 'Room'
+  Room: 'Room',
+  Shape: 'Shape'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -402,7 +403,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "chat" | "room"
+    modelProps: "user" | "chat" | "room" | "shape"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -628,6 +629,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Shape: {
+      payload: Prisma.$ShapePayload<ExtArgs>
+      fields: Prisma.ShapeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ShapeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ShapeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload>
+        }
+        findFirst: {
+          args: Prisma.ShapeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ShapeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload>
+        }
+        findMany: {
+          args: Prisma.ShapeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload>[]
+        }
+        create: {
+          args: Prisma.ShapeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload>
+        }
+        createMany: {
+          args: Prisma.ShapeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ShapeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload>[]
+        }
+        delete: {
+          args: Prisma.ShapeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload>
+        }
+        update: {
+          args: Prisma.ShapeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload>
+        }
+        deleteMany: {
+          args: Prisma.ShapeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ShapeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ShapeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload>[]
+        }
+        upsert: {
+          args: Prisma.ShapeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShapePayload>
+        }
+        aggregate: {
+          args: Prisma.ShapeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateShape>
+        }
+        groupBy: {
+          args: Prisma.ShapeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ShapeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ShapeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ShapeCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -682,9 +757,11 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const ChatScalarFieldEnum = {
   id: 'id',
+  type: 'type',
   message: 'message',
   userId: 'userId',
-  roomId: 'roomId'
+  roomId: 'roomId',
+  createdAt: 'createdAt'
 } as const
 
 export type ChatScalarFieldEnum = (typeof ChatScalarFieldEnum)[keyof typeof ChatScalarFieldEnum]
@@ -701,12 +778,31 @@ export const RoomScalarFieldEnum = {
 export type RoomScalarFieldEnum = (typeof RoomScalarFieldEnum)[keyof typeof RoomScalarFieldEnum]
 
 
+export const ShapeScalarFieldEnum = {
+  id: 'id',
+  roomId: 'roomId',
+  userId: 'userId',
+  data: 'data',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ShapeScalarFieldEnum = (typeof ShapeScalarFieldEnum)[keyof typeof ShapeScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -723,6 +819,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -770,6 +875,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -899,6 +1018,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   chat?: Prisma.ChatOmit
   room?: Prisma.RoomOmit
+  shape?: Prisma.ShapeOmit
 }
 
 /* Types for Logging */

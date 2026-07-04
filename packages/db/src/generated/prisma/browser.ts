@@ -32,3 +32,8 @@ export type Chat = Prisma.ChatModel
  * 
  */
 export type Room = Prisma.RoomModel
+/**
+ * Model Shape
+ * 
+ */
+export type Shape = Prisma.ShapeModel
