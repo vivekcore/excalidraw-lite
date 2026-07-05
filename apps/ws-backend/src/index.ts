@@ -1,102 +1,43 @@
-import jwt from "jsonwebtoken";
-import WebSocket, { WebSocketServer } from "ws";
-import { JWT_SECRET } from "./config";
-import { prisma } from "@repo/db/prisma";
+import { WebSocketServer } from "ws";
+import { connectionStore } from "./store";
+import { HandleAuth } from "./handlers/auth";
+import { HandleJoinRoom, HandleLeaveRoom } from "./handlers/room";
+import { HandleChat } from "./handlers/chat";
+import { ShapeHandler } from "./handlers/shape";
 
 const wss = new WebSocketServer({ port: 8080 });
 
-interface User {
-  ws: WebSocket;
-  room: string[];
-  userId: string;
-}
-let users: User[] = [];
-const checkUser = (token: string): string | null => {
-  try {
-    const decode = jwt.verify(token, JWT_SECRET);
-
-    if (typeof decode == "string") {
-      return null;
-    }
-    if (!decode || !decode.userId) {
-      return null;
-    }
-    return decode.userId;
-  } catch (error) {
-    console.log("url missing");
-    return null;
-  }
+const handlers: Record<string, (ws: import("ws").WebSocket, msg: any) => Promise<void> | void> = {
+  auth: HandleAuth,
+  join_room: HandleJoinRoom,
+  leave_room: HandleLeaveRoom,
+  chat: HandleChat,
+  "shape:create": ShapeHandler.createShape,
+  "shape:update": ShapeHandler.updateShape,
+  "shape:delete": ShapeHandler.deleteShape,
 };
 
-wss.on("connection", function connection(ws, request) {
+wss.on("connection", (ws) => {
   ws.on("error", console.error);
 
   ws.on("close", () => {
-    users = users.filter((u) => u.ws !== ws);
+    connectionStore.remove(ws)
   });
 
   ws.on("message", async (data) => {
     try {
-      const parseData = JSON.parse(data as unknown as string);
+      const msg = JSON.parse(data.toString())
 
-      if (!(ws as any).userId && parseData.type !== "auth") {
-        ws.close();
-        return;
+      const handler = handlers[msg.type]
+      if (!handler) {
+        ws.send(JSON.stringify({ type: "error", message: `Unknown type: ${msg.type}` }))
+        return
       }
-      if (parseData.type === "auth") {
-        const token = parseData.token;
-        const user = checkUser(token);
-        (ws as any).userId = user;
-        if (!user || user === null) {
-          ws.close();
-          return;
-        }
-        users.push({
-          ws,
-          userId: user,
-          room: [],
-        });
-      }
-
-      if (parseData.type === "join_room") {
-        const user = users.find((x) => x.ws === ws);
-        user?.room.push(parseData.roomId);
-      }
-
-      if (parseData.type === "leave_room") {
-        const user = users.find((x) => x.ws === ws);
-        if (!user) {
-          return;
-        }
-        user.room = user.room.filter((x) => x !== parseData.roomId);
-      }
-
-      if (parseData.type === "chat") {
-        const roomId = Number(parseData.roomId);
-        const message = parseData.message;
-
-        await prisma.chat.create({
-          data: {
-            message,
-            roomId,
-            userId: (ws as any).userId,
-          },
-        });
-        users.forEach((user) => {
-          if (user.room.includes(parseData.roomId) && ws !== user.ws) {
-            user.ws.send(
-              JSON.stringify({
-                type: "chat",
-                message: message,
-                roomId,
-              }),
-            );
-          }
-        });
-      }
+      await handler(ws, msg)
     } catch (error) {
-      console.log(error);
+      console.error("ws message error:", error)
+      ws.send(JSON.stringify({ type: "error", message: "Invalid message" }))
     }
-  });
-});
+  })
+})
 
