@@ -14,13 +14,18 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { Tshape } from "@/draw/types";
 import { Game } from "@/draw/Game";
+import { Listener } from "@/hooks/useWebSocket";
 
 export default function Canvas({
   roomId,
   socket,
+  sendMessage,
+  subscribe,
 }: {
   roomId: string;
   socket: WebSocket;
+  sendMessage: (data:string) => void
+  subscribe: (topic:string,fn: Listener) => void
 }) {
   const cnavasref = useRef<HTMLCanvasElement>(null);
 
@@ -41,10 +46,10 @@ export default function Canvas({
   useEffect(() => {
     if (cnavasref.current) {
       // InitDraw(cnavasref.current, roomId, socket, shapeRef,colorref);
-      new Game(cnavasref.current, roomId, colorref, shapeRef, socket);
+      new Game(cnavasref.current, roomId, colorref, shapeRef,subscribe,sendMessage);
       //newGame.destroy();
     }
-  }, [roomId, socket]);
+  }, [roomId, socket,sendMessage,subscribe]);
 
   // Keyboard Shortcuts for drawing tools
   useEffect(() => {

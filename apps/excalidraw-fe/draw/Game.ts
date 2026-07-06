@@ -1,6 +1,7 @@
 import { api } from "@/lib/axios";
 import { Shapes } from "./types";
 import { Tshape } from "./types";
+import { Listener } from "@/hooks/useWebSocket";
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -12,13 +13,15 @@ export class Game {
   private clicked: boolean;
   private startX: number;
   private startY: number;
-  private socket: WebSocket;
+  private subscribe : (topic:string,fn:Listener) => void;
+  private sendMessage: (data:string) => void
   constructor(
     canvas: HTMLCanvasElement,
     roomId: string,
     strokeColor: { current: string },
     shapeKind: { current: Tshape },
-    socket: WebSocket,
+    subscribe : (topic:string,fn:Listener) => void,
+    sendMessage: (data:string) => void,
     clicked: boolean = false,
     startX: number = 0,
     startY: number = 0,
@@ -29,23 +32,34 @@ export class Game {
     this.roomId = roomId;
     this.strokeColor = strokeColor;
     this.shapeKind = shapeKind;
-    this.socket = socket;
     this.clicked = clicked;
     this.startX = startX;
     this.startY = startY;
     this.init();
     this.initMouseEvents();
     this.socketMessage();
+    this.subscribe = subscribe
+    this.sendMessage = sendMessage
   }
   socketMessage() {
-    this.socket.onmessage = (e) => {
-      const message = JSON.parse(e.data);
-      if (message.type === "chat") {
-        const parserShape = JSON.parse(message.message);
-        this.existingShapes.push(parserShape);
-        this.ClearCanvas();
-      }
-    };
+
+    this.subscribe('draw',(data) => {
+       
+       if (data.type === "shape:create") {
+         const parserShape = JSON.parse(data.message);
+         this.existingShapes.push(parserShape);
+         this.ClearCanvas();
+       }
+    })
+
+    // this.socket.onmessage = (e) => {
+    //   const message = JSON.parse(e.data);
+    //   if (message.type === "shape:create") {
+    //     const parserShape = JSON.parse(message.message);
+    //     this.existingShapes.push(parserShape);
+    //     this.ClearCanvas();
+    //   }
+    // };
   }
   async init() {
     console.log("initilized");
@@ -101,7 +115,7 @@ export class Game {
   }
   async getShapes() {
     try {
-      const response = await api.get(`/room/chats/${this.roomId}`);
+      const response = await api.get(`/room/shapes/${this.roomId}`);
       const data = response.data.data as [];
       const parse: Shapes[] = data.map((e) => JSON.parse(e));
 
@@ -232,13 +246,19 @@ export class Game {
       height,
     };
     this.existingShapes.push(shape);
-    this.socket.send(
-      JSON.stringify({
-        type: "chat",
+      const data = JSON.stringify({
+        type: "shape:create",
         roomId: this.roomId,
         message: JSON.stringify(shape),
-      }),
-    );
+      })
+    this.sendMessage(data)
+    // this.socket.send(
+    //   JSON.stringify({
+    //     type: "shape:create",
+    //     roomId: this.roomId,
+    //     message: JSON.stringify(shape),
+    //   }),
+    // );
   }
 
   BroadCastEllipse(width: number, height: number) {
@@ -257,13 +277,19 @@ export class Game {
       strokeColor: this.strokeColor.current,
     };
     this.existingShapes.push(shape);
-    this.socket.send(
-      JSON.stringify({
-        type: "chat",
+      const data = JSON.stringify({
+        type: "shape:create",
         roomId: this.roomId,
         message: JSON.stringify(shape),
-      }),
-    );
+      })
+    this.sendMessage(data)
+    // this.socket.send(
+    //   JSON.stringify({
+    //     type: "shape:create",
+    //     roomId: this.roomId,
+    //     message: JSON.stringify(shape),
+    //   }),
+    // );
   }
   BroadCastLine(offsetX: number, offsetY: number) {
     const shape: Shapes = {
@@ -275,13 +301,19 @@ export class Game {
       strokeColor: this.strokeColor.current,
     };
     this.existingShapes.push(shape);
-    this.socket.send(
-      JSON.stringify({
-        type: "chat",
+      const data = JSON.stringify({
+        type: "shape:create",
         roomId: this.roomId,
         message: JSON.stringify(shape),
-      }),
-    );
+      })
+    this.sendMessage(data)
+    // this.socket.send(
+    //   JSON.stringify({
+    //     type: "shape:create",
+    //     roomId: this.roomId,
+    //     message: JSON.stringify(shape),
+    //   }),
+    // );
   }
   BroadCastTriangle(offsetX: number, offsetY: number) {
     const shape: Shapes = {
@@ -293,12 +325,18 @@ export class Game {
       strokeColor: this.strokeColor.current,
     };
     this.existingShapes.push(shape);
-    this.socket.send(
-      JSON.stringify({
-        type: "chat",
+    const data = JSON.stringify({
+        type: "shape:create",
         roomId: this.roomId,
         message: JSON.stringify(shape),
-      }),
-    );
+      })
+    this.sendMessage(data)
+    // this.socket.send(
+    //   JSON.stringify({
+    //     type: "shape:create",
+    //     roomId: this.roomId,
+    //     message: JSON.stringify(shape),
+    //   }),
+    // );
   }
 }
