@@ -1,8 +1,9 @@
+"use client"
 import { WS_URL } from "@/config";
 import { getToken } from "@/utils/token";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type Listener = (data: unknown) => void;
+export type Listener = (data: any) => void;
 export const useWebSocket = () => {
   const [status, setStatus] = useState<"connecting" | "open" | "closed">(
     "connecting",
@@ -13,6 +14,7 @@ export const useWebSocket = () => {
   const token = getToken();
 
   const connect = useCallback(() => {
+    
     const ws = new WebSocket(WS_URL);
     wsRef.current = ws;
 

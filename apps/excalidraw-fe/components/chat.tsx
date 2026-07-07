@@ -11,11 +11,12 @@ const Chat = ({
   roomId: string;
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [ServerRes, setServerRes] = useState([]);
+  const [ServerRes, setServerRes] = useState<string[]>([]);
   useEffect(() => {
-    subscribe("chat", (data) => {
-      setServerRes(data.message);
+    const unsub = subscribe("chat", (data) => {
+      setServerRes(prev => [...prev, data.message])
     });
+    return unsub
   }, [subscribe]);
 
   const handleMessage = () => {
@@ -28,12 +29,12 @@ const Chat = ({
     sendMessage(JSON.stringify(data));
   };
   return (
-    <div>
-      <div>
+    <div className="h-200 w-100 bg-white text-black">
+     <div>
         {ServerRes.map((data, index) => (
           <div key={index}>{data}</div>
         ))}
-      </div>
+      </div> 
       <input ref={inputRef} type="text" placeholder="Enter Your Message" />
       <button onClick={handleMessage}>Send</button>
     </div>

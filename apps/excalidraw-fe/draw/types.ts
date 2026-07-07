@@ -41,3 +41,11 @@ export type Shapes =
       endY: number;
       strokeColor:string
     };
+
+   export interface ApiRes {
+      id:string,
+      roomId: number,
+      userId: string,
+      data: string
+      createdAt: Date
+    }

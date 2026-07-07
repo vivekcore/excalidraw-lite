@@ -1,5 +1,5 @@
 import { api } from "@/lib/axios";
-import { Shapes } from "./types";
+import { ApiRes, Shapes } from "./types";
 import { Tshape } from "./types";
 import { Listener } from "@/hooks/useWebSocket";
 
@@ -13,15 +13,17 @@ export class Game {
   private clicked: boolean;
   private startX: number;
   private startY: number;
-  private subscribe : (topic:string,fn:Listener) => void;
-  private sendMessage: (data:string) => void
+  private subscribe: (topic: string, fn: Listener) => () => void;
+  private ussub?: () => void
+  private sendMessage: (data: string) => void;
+  private destroyed: boolean
   constructor(
     canvas: HTMLCanvasElement,
     roomId: string,
     strokeColor: { current: string },
     shapeKind: { current: Tshape },
-    subscribe : (topic:string,fn:Listener) => void,
-    sendMessage: (data:string) => void,
+    subscribe: (topic: string, fn: Listener) => () => void,
+    sendMessage: (data: string) => void,
     clicked: boolean = false,
     startX: number = 0,
     startY: number = 0,
@@ -35,38 +37,29 @@ export class Game {
     this.clicked = clicked;
     this.startX = startX;
     this.startY = startY;
+    this.sendMessage = sendMessage;
+    this.subscribe = subscribe;
+    this.destroyed = true
     this.init();
-    this.initMouseEvents();
     this.socketMessage();
-    this.subscribe = subscribe
-    this.sendMessage = sendMessage
+    this.initMouseEvents();
   }
   socketMessage() {
-
-    this.subscribe('draw',(data) => {
-       
-       if (data.type === "shape:create") {
-         const parserShape = JSON.parse(data.message);
-         this.existingShapes.push(parserShape);
-         this.ClearCanvas();
-       }
-    })
-
-    // this.socket.onmessage = (e) => {
-    //   const message = JSON.parse(e.data);
-    //   if (message.type === "shape:create") {
-    //     const parserShape = JSON.parse(message.message);
-    //     this.existingShapes.push(parserShape);
-    //     this.ClearCanvas();
-    //   }
-    // };
+  this.ussub = this.subscribe("shape:create", (data) => {
+      const parserShape = JSON.parse(data.shape);
+      console.log("subscribed")
+      this.existingShapes.push(parserShape);
+      this.ClearCanvas();
+    });
   }
   async init() {
-    console.log("initilized");
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     if (!this.ctx) return;
+    
     this.existingShapes = await this.getShapes();
+    if(this.destroyed) return
+
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillStyle = "black";
     this.ClearCanvas();
@@ -117,25 +110,27 @@ export class Game {
     try {
       const response = await api.get(`/room/shapes/${this.roomId}`);
       const data = response.data.data as [];
-      const parse: Shapes[] = data.map((e) => JSON.parse(e));
-
+      console.log(data)
+      const parse = data.map((e: ApiRes) => JSON.parse(e.data));
       return parse;
+      
     } catch (error) {
-      console.log(error);
+      console.log(JSON.stringify(error));
       return [];
     }
   }
-
   initMouseEvents() {
     this.canvas.addEventListener("mouseup", this.onMouseUp);
     this.canvas.addEventListener("mousedown", this.onMouseDown);
     this.canvas.addEventListener("mousemove", this.onMouseMove);
-
-    return () => {
-      this.canvas.removeEventListener("mouseup", this.onMouseDown);
-      this.canvas.removeEventListener("mousemove", this.onMouseMove);
-      this.canvas.removeEventListener("mouseleave", this.onMouseUp);
-    };
+  }
+  destroy() {
+    this.canvas.removeEventListener("mouseup", this.onMouseUp);
+    this.canvas.removeEventListener("mousemove", this.onMouseMove);
+    this.canvas.removeEventListener("mousedown", this.onMouseDown);
+    this.destroyed = true
+    this.ussub?.()
+    this.ussub = undefined
   }
 
   private onMouseDown = (e: MouseEvent) => {
@@ -168,7 +163,6 @@ export class Game {
     if (this.shapeKind.current !== "pencil") {
       this.ClearCanvas();
     }
-    console.log("mosue up");
   };
   private onMouseMove = (e: MouseEvent) => {
     if (this.clicked === false) return;
@@ -202,7 +196,6 @@ export class Game {
         break;
     }
     this.ctx.stroke();
-    console.log("mosue move");
   };
 
   CreateCircle(width: number, height: number) {
@@ -231,9 +224,17 @@ export class Game {
   CreateWithPencil(offsetX: number, offsetY: number) {
     this.ctx.moveTo(this.startX, this.startY);
     this.ctx.lineTo(offsetX, offsetY);
-    this.ctx.lineWidth = 3;
     this.ctx.lineCap = "round";
     this.ctx.lineJoin = "round";
+    const shape:Shapes = {
+      type: "line",
+      strokeColor: this.strokeColor.current,
+      startX: this.startX,
+      startY: this.startY,
+      endX:offsetX,
+      endY:offsetY,
+    };
+    this.existingShapes.push(shape);
   }
 
   BroadCastRectangle(width: number, height: number) {
@@ -246,21 +247,13 @@ export class Game {
       height,
     };
     this.existingShapes.push(shape);
-      const data = JSON.stringify({
-        type: "shape:create",
-        roomId: this.roomId,
-        message: JSON.stringify(shape),
-      })
-    this.sendMessage(data)
-    // this.socket.send(
-    //   JSON.stringify({
-    //     type: "shape:create",
-    //     roomId: this.roomId,
-    //     message: JSON.stringify(shape),
-    //   }),
-    // );
+    const data = JSON.stringify({
+      type: "shape:create",
+      roomId: this.roomId,
+      shape: JSON.stringify(shape),
+    });
+    this.sendMessage(data);
   }
-
   BroadCastEllipse(width: number, height: number) {
     const centerX = this.startX + width / 2;
     const centerY = this.startY + height / 2;
@@ -277,19 +270,12 @@ export class Game {
       strokeColor: this.strokeColor.current,
     };
     this.existingShapes.push(shape);
-      const data = JSON.stringify({
-        type: "shape:create",
-        roomId: this.roomId,
-        message: JSON.stringify(shape),
-      })
-    this.sendMessage(data)
-    // this.socket.send(
-    //   JSON.stringify({
-    //     type: "shape:create",
-    //     roomId: this.roomId,
-    //     message: JSON.stringify(shape),
-    //   }),
-    // );
+    const data = JSON.stringify({
+      type: "shape:create",
+      roomId: this.roomId,
+      shape: JSON.stringify(shape),
+    });
+    this.sendMessage(data);
   }
   BroadCastLine(offsetX: number, offsetY: number) {
     const shape: Shapes = {
@@ -301,19 +287,12 @@ export class Game {
       strokeColor: this.strokeColor.current,
     };
     this.existingShapes.push(shape);
-      const data = JSON.stringify({
-        type: "shape:create",
-        roomId: this.roomId,
-        message: JSON.stringify(shape),
-      })
-    this.sendMessage(data)
-    // this.socket.send(
-    //   JSON.stringify({
-    //     type: "shape:create",
-    //     roomId: this.roomId,
-    //     message: JSON.stringify(shape),
-    //   }),
-    // );
+    const data = JSON.stringify({
+      type: "shape:create",
+      roomId: this.roomId,
+      shape: JSON.stringify(shape),
+    });
+    this.sendMessage(data);
   }
   BroadCastTriangle(offsetX: number, offsetY: number) {
     const shape: Shapes = {
@@ -326,17 +305,10 @@ export class Game {
     };
     this.existingShapes.push(shape);
     const data = JSON.stringify({
-        type: "shape:create",
-        roomId: this.roomId,
-        message: JSON.stringify(shape),
-      })
-    this.sendMessage(data)
-    // this.socket.send(
-    //   JSON.stringify({
-    //     type: "shape:create",
-    //     roomId: this.roomId,
-    //     message: JSON.stringify(shape),
-    //   }),
-    // );
+      type: "shape:create",
+      roomId: this.roomId,
+      shape: JSON.stringify(shape),
+    });
+    this.sendMessage(data);
   }
 }

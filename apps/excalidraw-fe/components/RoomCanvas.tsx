@@ -2,9 +2,19 @@
 import Canvas from "./canvas";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import Chat from "./chat";
+import { useEffect } from "react";
 
 const RoomCanvas = ({ roomId }: { roomId: string }) => {
-  const { socket, status,sendMessage,subscribe } = useWebSocket();
+  const { socket, status, sendMessage, subscribe } = useWebSocket();
+
+  useEffect(() => {
+    if(!socket) return
+    const data = JSON.stringify({
+      type: "join_room",
+      roomId,
+    });
+    sendMessage(data);
+  }, [sendMessage, roomId,socket]);
 
   if (status === "connecting" || socket === null) {
     return <div>Connecting to server</div>;
@@ -12,8 +22,18 @@ const RoomCanvas = ({ roomId }: { roomId: string }) => {
 
   return (
     <>
-      <Canvas sendMessage={sendMessage} subscribe={subscribe}  socket={socket} roomId={roomId}></Canvas>
-      <Chat sendMessage={sendMessage} subscribe={subscribe} roomId={roomId}></Chat>
+      <Canvas
+        sendMessage={sendMessage}
+        subscribe={subscribe}
+        roomId={roomId}
+      ></Canvas>
+      <Chat 
+
+        sendMessage={sendMessage}
+        subscribe={subscribe}
+        roomId={roomId}
+        
+      ></Chat>
     </>
   );
 };
