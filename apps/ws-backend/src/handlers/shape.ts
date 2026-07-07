@@ -18,7 +18,7 @@ export const ShapeHandler = {
           data: msg.shape,
         },
       })
-      broadcastToRoom(String(roomId), { type: "shape:create", shape }, ws)
+      broadcastToRoom(String(roomId), { type: "shape:create", shape:shape.data }, ws)
     } catch (error) {
       console.error("shape:create error:", error)
     }
