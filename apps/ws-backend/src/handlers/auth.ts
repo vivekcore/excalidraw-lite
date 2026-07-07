@@ -1,5 +1,5 @@
 import Jwt, { JwtPayload } from "jsonwebtoken";
-import { JWT_SECRET } from "../config";
+import { JWT_SECRET } from "../config/EnvVaribles";
 import { connectionStore } from "../store";
 import WebSocket from "ws";
 

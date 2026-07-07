@@ -1,4 +1,4 @@
-import { WebSocketServer } from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 import { connectionStore } from "./store";
 import { HandleAuth } from "./handlers/auth";
 import { HandleJoinRoom, HandleLeaveRoom } from "./handlers/room";
@@ -7,7 +7,7 @@ import { ShapeHandler } from "./handlers/shape";
 
 const wss = new WebSocketServer({ port: 8080 });
 
-const handlers: Record<string, (ws: import("ws").WebSocket, msg: any) => Promise<void> | void> = {
+const handlers: Record<string, (ws: WebSocket, msg: any) => Promise<void> | void> = {
   auth: HandleAuth,
   join_room: HandleJoinRoom,
   leave_room: HandleLeaveRoom,
