@@ -8,6 +8,6 @@ router.post("/delete",Middleware,roomController.deleteRoom)
 router.patch("/update",Middleware,roomController.updateRoom)
 router.get("/chats/:roomId",Middleware,roomController.getChatByRoomId);
 router.get("/my-rooms",Middleware,roomController.myRooms)
-router.get("/room/:slug",Middleware,roomController.getRoombySlug)
-router.get("/room/shapes/:roomId",Middleware,roomController.getRoomShapes)
+router.get("/:slug",Middleware,roomController.getRoombySlug)
+router.get("/shapes/:roomId",Middleware,roomController.getRoomShapes)
 export default router;

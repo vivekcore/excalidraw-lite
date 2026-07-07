@@ -1,6 +1,6 @@
 import {  Router } from "express";
-import { Middleware } from "../middleware/userrMiddleware.js";
 import { userController } from "../controllers/user.controller.js";
+import { Middleware } from "../middleware/authMiddleware.js";
 const router: Router = Router();
 
 router.post("/signup", userController.SignupUser);

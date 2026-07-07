@@ -1,6 +1,4 @@
 import type { Request, Response, NextFunction } from 'express';
-
-import { prisma } from '@repo/db';
 import { Prisma } from '@repo/db/prismaClient';
 import {AppError} from '@repo/db/error'
 export const errorHandler = (
