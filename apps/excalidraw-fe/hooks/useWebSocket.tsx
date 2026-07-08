@@ -3,7 +3,12 @@ import { WS_URL } from "@/config";
 import { getToken } from "@/utils/token";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type Listener = (data: any) => void;
+export type SocketMessage = {
+  type: string;
+  [key: string]: unknown;
+};
+
+export type Listener = (data: SocketMessage) => void;
 export const useWebSocket = () => {
   const [status, setStatus] = useState<"connecting" | "open" | "closed">(
     "connecting",

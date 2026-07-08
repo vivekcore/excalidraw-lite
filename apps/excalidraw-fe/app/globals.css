@@ -1,8 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0f0f0f;
-  --foreground: #e6e6e6;
+  --background: #0b0d12;
+  --foreground: #f7f4df;
+  --pixel-ink: #07080d;
+  --pixel-panel: #151925;
+  --pixel-panel-2: #20283a;
+  --pixel-line: #3d4968;
+  --pixel-text: #f7f4df;
+  --pixel-muted: #9aa6c2;
+  --pixel-cyan: #42f5e8;
+  --pixel-yellow: #ffe66d;
+  --pixel-pink: #ff4d8d;
+  --pixel-green: #6dff8f;
 
   --black-100: #0a0a0a;
   --black-150: #0f0f0f;
@@ -53,5 +63,211 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--pixel-yellow);
+  color: var(--pixel-ink);
+}
+
+.pixel-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(66, 245, 232, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(66, 245, 232, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at top left, rgba(255, 77, 141, 0.15), transparent 34rem),
+    radial-gradient(circle at bottom right, rgba(255, 230, 109, 0.12), transparent 30rem),
+    var(--background);
+  background-size: 24px 24px, 24px 24px, auto, auto, auto;
+  color: var(--pixel-text);
+}
+
+.pixel-page::before,
+.pixel-canvas-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.04) 0,
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  mix-blend-mode: overlay;
+}
+
+.pixel-panel {
+  background: var(--pixel-panel);
+  border: 2px solid var(--pixel-line);
+  box-shadow: 8px 8px 0 var(--pixel-ink);
+}
+
+.pixel-panel-strong {
+  background: var(--pixel-panel-2);
+  border: 2px solid var(--pixel-yellow);
+  box-shadow: 8px 8px 0 var(--pixel-ink);
+}
+
+.pixel-card {
+  background:
+    linear-gradient(135deg, rgba(66, 245, 232, 0.08), transparent 42%),
+    var(--pixel-panel);
+  border: 2px solid var(--pixel-line);
+  box-shadow: 6px 6px 0 var(--pixel-ink);
+}
+
+.pixel-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid var(--pixel-line);
+  background: var(--pixel-panel-2);
+  color: var(--pixel-text);
+  box-shadow: 4px 4px 0 var(--pixel-ink);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.pixel-button:hover {
+  border-color: var(--pixel-cyan);
+  background: #263048;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--pixel-ink);
+}
+
+.pixel-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--pixel-ink);
+}
+
+.pixel-button-primary {
+  background: var(--pixel-yellow);
+  border-color: var(--pixel-yellow);
+  color: var(--pixel-ink);
+}
+
+.pixel-button-primary:hover {
+  background: #fff09c;
+  border-color: #fff09c;
+}
+
+.pixel-button-danger {
+  background: var(--pixel-pink);
+  border-color: var(--pixel-pink);
+  color: var(--pixel-ink);
+}
+
+.pixel-button-danger:hover {
+  background: #ff7aaa;
+  border-color: #ff7aaa;
+}
+
+.pixel-input {
+  width: 100%;
+  border: 2px solid var(--pixel-line);
+  background: #0f1320;
+  color: var(--pixel-text);
+  outline: none;
+  box-shadow: inset 3px 3px 0 var(--pixel-ink);
+}
+
+.pixel-input::placeholder {
+  color: var(--pixel-muted);
+}
+
+.pixel-input:focus {
+  border-color: var(--pixel-cyan);
+}
+
+.pixel-label {
+  font-family: var(--font-geist-mono), monospace;
+  color: var(--pixel-yellow);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.pixel-kicker {
+  font-family: var(--font-geist-mono), monospace;
+  color: var(--pixel-cyan);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.pixel-title {
+  font-family: var(--font-geist-mono), monospace;
+  letter-spacing: 0;
+  text-shadow: 4px 4px 0 var(--pixel-ink);
+}
+
+.pixel-stat {
+  border: 2px solid var(--pixel-line);
+  background: #101522;
+  box-shadow: 4px 4px 0 var(--pixel-ink);
+}
+
+.pixel-grid-bg {
+  background-image:
+    linear-gradient(rgba(66, 245, 232, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(66, 245, 232, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.pixel-canvas-shell {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(255, 230, 109, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(66, 245, 232, 0.04) 1px, transparent 1px),
+    #07080d;
+  background-size: 32px 32px;
+}
+
+.pixel-tool {
+  border: 2px solid var(--pixel-line);
+  background: #151925;
+  color: var(--pixel-text);
+  box-shadow: 3px 3px 0 var(--pixel-ink);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.pixel-tool:hover {
+  border-color: var(--pixel-cyan);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--pixel-ink);
+}
+
+.pixel-tool-active {
+  border-color: var(--pixel-yellow);
+  background: var(--pixel-yellow);
+  color: var(--pixel-ink);
 }

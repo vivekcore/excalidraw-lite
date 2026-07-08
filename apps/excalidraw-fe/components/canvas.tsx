@@ -1,15 +1,14 @@
 "use client";
-//import InitDraw from "@/draw";
 import {
+  Check,
+  Copy,
   Ellipse,
   Minus,
-  RectangleHorizontal,
-  Triangle,
   MousePointer,
   Paintbrush,
-  Copy,
-  Check,
   Pencil,
+  RectangleHorizontal,
+  Triangle,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Tshape } from "@/draw/types";
@@ -22,11 +21,10 @@ export default function Canvas({
   subscribe,
 }: {
   roomId: string;
-  sendMessage: (data:string) => void
-  subscribe: (topic:string,fn: Listener) => () => void
+  sendMessage: (data: string) => void;
+  subscribe: (topic: string, fn: Listener) => () => void;
 }) {
   const cnavasref = useRef<HTMLCanvasElement>(null);
-
   const [color, setColor] = useState<string>("#FFFF00");
   const colorref = useRef<string>(color);
   const [shape, setShape] = useState<Tshape>(null);
@@ -43,13 +41,18 @@ export default function Canvas({
 
   useEffect(() => {
     if (cnavasref.current) {
-      // InitDraw(cnavasref.current, roomId, socket, shapeRef,colorref);
-   const game = new Game(cnavasref.current, roomId, colorref, shapeRef,subscribe,sendMessage);
+      const game = new Game(
+        cnavasref.current,
+        roomId,
+        colorref,
+        shapeRef,
+        subscribe,
+        sendMessage,
+      );
       return () => game.destroy();
     }
-  }, [roomId,sendMessage,subscribe]);
+  }, [roomId, sendMessage, subscribe]);
 
-  // Keyboard Shortcuts for drawing tools
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
@@ -107,24 +110,25 @@ export default function Canvas({
     { id: null, icon: MousePointer, label: "Select (V / 1)" },
     { id: "rectangle", icon: RectangleHorizontal, label: "Rectangle (R / 2)" },
     { id: "ellipse", icon: Ellipse, label: "Ellipse (E / 3)" },
-    { id: "triangle", icon: Triangle, label: "Triangle (T / 3)" },
-    { id: "line", icon: Minus, label: "Line (L / 3)" },
-    { id: "pencil", icon: Pencil, label: "Pencil (p / 6)" },
+    { id: "triangle", icon: Triangle, label: "Triangle (T / 4)" },
+    { id: "line", icon: Minus, label: "Line (L / 5)" },
+    { id: "pencil", icon: Pencil, label: "Pencil" },
   ] as const;
 
   return (
     <>
       <canvas
-        className="relative bg-zinc-950 block w-full h-full"
+        className="absolute inset-0 block h-full w-full bg-[#07080d]"
         ref={cnavasref}
       />
 
-      <div className="absolute w-40 bg-mauve-800  top-30 left-10 rounded-xl px-1">
-        <div className="flex items-center justify-around">
-          <label className=" text-sm" htmlFor="color">
-            Stroke{" "}
+      <div className="pixel-panel fixed left-4 top-24 z-50 w-44 p-3 sm:left-6 sm:top-28">
+        <div className="space-y-2">
+          <label className="pixel-label" htmlFor="color">
+            Stroke
           </label>
           <input
+            className="h-10 w-full cursor-pointer border-2 border-[var(--pixel-line)] bg-[#0f1320] p-1 shadow-[3px_3px_0_var(--pixel-ink)]"
             onChange={handleChange}
             value={color}
             type="color"
@@ -133,26 +137,22 @@ export default function Canvas({
         </div>
       </div>
 
-      {/* Floating Modern Header */}
-      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center bg-zinc-900/90 backdrop-blur-md border border-zinc-800/80 px-4 py-2 rounded-2xl shadow-[0_12px_40px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-zinc-700/80">
-        {/* Left Section: Brand Logo & Title */}
-
-        <div className="flex items-center gap-2.5 border-r border-zinc-800/80 pr-4 mr-1">
-          <div className="w-8 h-8 rounded-xl 0 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Paintbrush className="w-4 h-4 text-white animate-pulse" />
+      <div className="pixel-panel fixed left-1/2 top-4 z-50 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-col gap-3 p-2 sm:top-6 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-2 border-b-2 border-[var(--pixel-line)] px-2 pb-2 sm:border-b-0 sm:border-r-2 sm:pb-0 sm:pr-4">
+          <div className="grid h-9 w-9 place-items-center border-2 border-[var(--pixel-cyan)] bg-[#0f1320] shadow-[3px_3px_0_var(--pixel-ink)]">
+            <Paintbrush className="h-4 w-4 animate-pulse text-[var(--pixel-cyan)]" />
           </div>
-          <div className="hidden md:flex flex-col">
-            <span className="text-xs font-semibold text-zinc-100 tracking-wide leading-none">
+          <div className="flex flex-col">
+            <span className="font-mono text-xs font-black uppercase leading-none text-[var(--pixel-text)]">
               ExcaliDraw
             </span>
-            <span className="text-[10px] text-zinc-500 font-medium leading-none mt-0.5">
+            <span className="mt-1 font-mono text-[10px] font-black uppercase leading-none text-[var(--pixel-yellow)]">
               Lite
             </span>
           </div>
         </div>
 
-        {/* Middle Section: Drawing Tools */}
-        <div className="flex items-center gap-1.5 px-3">
+        <div className="grid grid-cols-6 gap-1.5 sm:flex sm:items-center sm:px-2">
           {tools.map((tool) => {
             const IconComponent = tool.icon;
             const isActive = shape === tool.id;
@@ -160,18 +160,18 @@ export default function Canvas({
               <div key={tool.id ?? "select"} className="relative group">
                 <button
                   onClick={() => setShape(tool.id)}
-                  className={`p-2 rounded-xl transition-all duration-200 flex items-center justify-center border cursor-pointer active:scale-95 ${
+                  className={`pixel-tool flex h-9 w-9 items-center justify-center ${
                     isActive
-                      ? " shadow-[0_0_12px_rgba(139,92,246,0.15)]"
-                      : "bg-transparent border-transparent text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50"
+                      ? "pixel-tool-active"
+                      : "text-[var(--pixel-muted)]"
                   }`}
                   aria-label={tool.label}
+                  title={tool.label}
                 >
-                  <IconComponent className="w-4 h-4 stroke-2" />
+                  <IconComponent className="h-4 w-4 stroke-2" />
                 </button>
 
-                {/* Tooltip */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 scale-95 opacity-0 group-hover:scale-100 group-hover:opacity-100 pointer-events-none transition-all duration-200 bg-zinc-950 text-zinc-200 text-[10px] font-medium px-2 py-1.5 rounded-lg border border-zinc-800 shadow-xl whitespace-nowrap z-50">
+                <div className="pointer-events-none absolute left-1/2 top-full z-50 mt-3 -translate-x-1/2 scale-95 whitespace-nowrap border-2 border-[var(--pixel-line)] bg-[#0f1320] px-2 py-1.5 font-mono text-[10px] font-black uppercase text-[var(--pixel-text)] opacity-0 shadow-[3px_3px_0_var(--pixel-ink)] transition-all duration-150 group-hover:scale-100 group-hover:opacity-100">
                   {tool.label}
                 </div>
               </div>
@@ -179,20 +179,21 @@ export default function Canvas({
           })}
         </div>
 
-        {/* Right Section: Room ID Info with Copy Action */}
-        <div className="flex items-center gap-2 border-l border-zinc-800/80 pl-4 ml-1">
+        <div className="border-t-2 border-[var(--pixel-line)] pt-2 sm:border-l-2 sm:border-t-0 sm:pl-3 sm:pt-0">
           <button
             onClick={handleCopyRoomId}
-            className="flex items-center gap-2 bg-zinc-950/60 hover:bg-zinc-800/50 border border-zinc-800 hover:border-zinc-700/60 rounded-xl px-3 py-1.5 text-xs text-zinc-400 font-medium transition-all duration-150 cursor-pointer active:scale-95"
+            className="pixel-button max-w-full px-3 py-2 text-xs"
             title="Click to copy Room ID"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="hidden sm:inline">Room:</span>
-            <span className="font-mono text-zinc-300 select-all">{roomId}</span>
+            <span className="h-2 w-2 animate-pulse bg-[var(--pixel-green)]" />
+            <span className="hidden sm:inline">Room</span>
+            <span className="max-w-28 truncate font-mono select-all text-[var(--pixel-text)] sm:max-w-40">
+              {roomId}
+            </span>
             {copied ? (
-              <Check className="w-3.5 h-3.5 text-emerald-400 transition-all" />
+              <Check className="h-3.5 w-3.5 text-[var(--pixel-green)]" />
             ) : (
-              <Copy className="w-3.5 h-3.5 text-zinc-500 hover:text-zinc-300 transition-all" />
+              <Copy className="h-3.5 w-3.5 text-[var(--pixel-cyan)]" />
             )}
           </button>
         </div>

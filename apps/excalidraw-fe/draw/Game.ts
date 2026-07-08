@@ -14,9 +14,9 @@ export class Game {
   private startX: number;
   private startY: number;
   private subscribe: (topic: string, fn: Listener) => () => void;
-  private ussub?: () => void
+  private ussub?: () => void;
   private sendMessage: (data: string) => void;
-  private destroyed: boolean
+  private destroyed: boolean;
   constructor(
     canvas: HTMLCanvasElement,
     roomId: string,
@@ -39,15 +39,15 @@ export class Game {
     this.startY = startY;
     this.sendMessage = sendMessage;
     this.subscribe = subscribe;
-    this.destroyed = true
+    this.destroyed = false;
     this.init();
     this.socketMessage();
     this.initMouseEvents();
   }
   socketMessage() {
-  this.ussub = this.subscribe("shape:create", (data) => {
-      const parserShape = JSON.parse(data.shape);
-      console.log("subscribed")
+    this.ussub = this.subscribe("shape:create", (data) => {
+      const parserShape = JSON.parse(JSON.stringify(data.shape));
+      console.log("subscribed");
       this.existingShapes.push(parserShape);
       this.ClearCanvas();
     });
@@ -56,12 +56,12 @@ export class Game {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     if (!this.ctx) return;
-    
-    this.existingShapes = await this.getShapes();
-    if(this.destroyed) return
 
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.existingShapes = await this.getShapes();
+    if (this.destroyed) return;
+
     this.ctx.fillStyle = "black";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ClearCanvas();
   }
   ClearCanvas() {
@@ -110,10 +110,9 @@ export class Game {
     try {
       const response = await api.get(`/room/shapes/${this.roomId}`);
       const data = response.data.data as [];
-      console.log(data)
+      console.log(data);
       const parse = data.map((e: ApiRes) => JSON.parse(e.data));
       return parse;
-      
     } catch (error) {
       console.log(JSON.stringify(error));
       return [];
@@ -128,9 +127,9 @@ export class Game {
     this.canvas.removeEventListener("mouseup", this.onMouseUp);
     this.canvas.removeEventListener("mousemove", this.onMouseMove);
     this.canvas.removeEventListener("mousedown", this.onMouseDown);
-    this.destroyed = true
-    this.ussub?.()
-    this.ussub = undefined
+    this.destroyed = true;
+    this.ussub?.();
+    this.ussub = undefined;
   }
 
   private onMouseDown = (e: MouseEvent) => {
@@ -192,6 +191,7 @@ export class Game {
         this.CreateWithPencil(e.offsetX, e.offsetY);
         this.startX = e.offsetX;
         this.startY = e.offsetY;
+        break;
       default:
         break;
     }
@@ -226,13 +226,13 @@ export class Game {
     this.ctx.lineTo(offsetX, offsetY);
     this.ctx.lineCap = "round";
     this.ctx.lineJoin = "round";
-    const shape:Shapes = {
+    const shape: Shapes = {
       type: "line",
       strokeColor: this.strokeColor.current,
       startX: this.startX,
       startY: this.startY,
-      endX:offsetX,
-      endY:offsetY,
+      endX: offsetX,
+      endY: offsetY,
     };
     this.existingShapes.push(shape);
   }
