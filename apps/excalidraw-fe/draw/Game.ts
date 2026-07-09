@@ -46,8 +46,7 @@ export class Game {
   }
   socketMessage() {
     this.ussub = this.subscribe("shape:create", (data) => {
-      const parserShape = JSON.parse(JSON.stringify(data.shape));
-      console.log("subscribed");
+      const parserShape = JSON.parse(data.shape as string);
       this.existingShapes.push(parserShape);
       this.ClearCanvas();
     });
@@ -110,7 +109,6 @@ export class Game {
     try {
       const response = await api.get(`/room/shapes/${this.roomId}`);
       const data = response.data.data as [];
-      console.log(data);
       const parse = data.map((e: ApiRes) => JSON.parse(e.data));
       return parse;
     } catch (error) {

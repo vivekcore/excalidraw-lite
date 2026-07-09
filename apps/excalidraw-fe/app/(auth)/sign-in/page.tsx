@@ -24,6 +24,7 @@ const SignIn = () => {
     try {
       const response = await api.post("/auth/signin", data);
       localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem('userId',response.data.data.user.id)
       router.push("/room");
     } catch (error) {
       console.log(error);

@@ -10,6 +10,7 @@ const RoomCanvas = ({ roomId }: { roomId: string }) => {
 
   useEffect(() => {
     if (!socket) return;
+    
     const data = JSON.stringify({
       type: "join_room",
       roomId,

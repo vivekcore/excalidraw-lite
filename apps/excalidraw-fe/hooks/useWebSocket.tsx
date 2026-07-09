@@ -31,6 +31,7 @@ export const useWebSocket = () => {
 
     ws.onmessage = (event) => {
       const response = JSON.parse(event.data);
+
       if (response.type === "error") {
         console.log(response.message);
         return;
@@ -56,6 +57,7 @@ export const useWebSocket = () => {
   }, [connect]);
 
   const sendMessage = useCallback((data: string) => {
+    
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(data);
     } else {

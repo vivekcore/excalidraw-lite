@@ -1,4 +1,5 @@
 "use client";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import { api } from "@/lib/axios";
 import { getToken } from "@/utils/token";
 import { ArrowLeft, ArrowRight, DoorOpen } from "lucide-react";
@@ -17,12 +18,14 @@ const Page = () => {
   }, [router]);
 
   const { register, handleSubmit } = useForm<{ roomId: string }>();
+  const {status} = useWebSocket()
   const onSubmit = async (data: { roomId: string }) => {
     try {
       const response = await api.get(`/room/chats/${data.roomId}`);
-      if (response.status === 200) {
+      if (response.status === 200 && status === 'open') {
         router.push(`/canvas/${data.roomId}`);
       }
+      
     } catch (error) {
       console.log(error);
     }
