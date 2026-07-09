@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export type SocketMessage = {
   type: string;
-  [key: string]: unknown;
+  key: string
 };
 
 export type Listener = (data: SocketMessage) => void;
@@ -30,7 +30,7 @@ export const useWebSocket = () => {
     };
 
     ws.onmessage = (event) => {
-      const response = JSON.parse(event.data);
+      const response = event.data
 
       if (response.type === "error") {
         console.log(response.message);
