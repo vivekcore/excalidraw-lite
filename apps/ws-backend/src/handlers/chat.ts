@@ -8,7 +8,7 @@ export async function HandleChat(ws: WebSocket, msg: any) {
   try {
     const conn = connectionStore.get(ws)
     if (!conn) return
-    const roomId = Number(msg.roomId)
+    const roomId = Number( msg.roomId)
     if (!msg.message || !roomId) return
     const data = {
       type:'text',
@@ -22,7 +22,6 @@ export async function HandleChat(ws: WebSocket, msg: any) {
       removeOnComplete:true,
       removeOnFail:false
     })
-
     broadcastToRoom(String(roomId), { type: "chat", message: res.data.message, userId: conn.userId }, ws)
   } catch (error) {
     console.error("chat error:", error)

@@ -4,7 +4,7 @@ import { HandleAuth } from "./handlers/auth";
 import { HandleJoinRoom, HandleLeaveRoom } from "./handlers/room";
 import { HandleChat } from "./handlers/chat";
 import { ShapeHandler } from "./handlers/shape";
-
+import "./workers/main.worker"
 const wss = new WebSocketServer({ port: 8080 });
 
 const handlers: Record<string, (ws: WebSocket, msg: any) => Promise<void> | void> = {

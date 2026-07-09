@@ -13,7 +13,7 @@ export const ShapeHandler = {
       const data = {
         roomId,
         userId: conn.userId,
-        shape: msg.shape,
+        data: msg.shape,
       };
       const res = await mainQueue.add("create-shape", data, {
         attempts: 3,
@@ -40,7 +40,7 @@ export const ShapeHandler = {
       const data = {
         id: msg.shapeId,
         shape: msg.shape,
-        roomId: msg.roomId,
+        roomId: Number(msg.roomId),
       };
       const res = await mainQueue.add("update-shape", data, {
         attempts: 3,
@@ -66,7 +66,7 @@ export const ShapeHandler = {
 
       const data = {
         id: msg.shapeId,
-        roomId: msg.roomId,
+        roomId: Number(msg.roomId),
       };
       const res = await mainQueue.add("delete-shape", data, {
         attempts: 3,
