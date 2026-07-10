@@ -36,7 +36,7 @@ const Chat = ({
 
   useEffect(() => {
     const unsub = subscribe("chat", (data) => {
-      setServerRes((prev) => [...prev, JSON.stringify(data.message)]);
+      setServerRes((prev) => [...prev, data.message as string]);
     });
     return unsub;
   }, [subscribe]);
