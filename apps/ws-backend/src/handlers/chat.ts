@@ -22,7 +22,7 @@ export async function HandleChat(ws: WebSocket, msg: any) {
       removeOnComplete:true,
       removeOnFail:false
     })
-    broadcastToRoom(String(roomId), { type: "chat", message: res.data.message, userId: conn.userId }, ws)
+    broadcastToRoom(String(roomId), { type: "chat", message: msg.message, userId: conn.userId }, ws)
   } catch (error) {
     console.error("chat error:", error)
   }

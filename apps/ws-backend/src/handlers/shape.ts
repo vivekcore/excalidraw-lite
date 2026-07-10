@@ -22,9 +22,10 @@ export const ShapeHandler = {
         removeOnFail: false,
       });
 
+
       broadcastToRoom(
-        String(res.data.roomId),
-        { type: "shape:create", shape: res.data.shape },
+        String(msg.roomId),
+        { type: "shape:create", shape: msg.shape },
         ws,
       );
     } catch (error) {
@@ -50,8 +51,8 @@ export const ShapeHandler = {
       });
 
       broadcastToRoom(
-        String(res.data.roomId),
-        { type: "shape:update", shapeId: res.data.id, shape: res.data.shape },
+        String(msg.roomId),
+        { type: "shape:update", shapeId: msg.shapeId, shape: msg.shape },
         ws,
       );
     } catch (error) {
@@ -76,7 +77,7 @@ export const ShapeHandler = {
       });
       broadcastToRoom(
         String(res.data.roomId),
-        { type: "shape:delete", shapeId: res.data.id },
+        { type: "shape:delete", shapeId: msg.shapeId },
         ws,
       );
     } catch (error) {
