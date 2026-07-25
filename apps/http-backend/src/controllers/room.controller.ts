@@ -6,7 +6,7 @@ export const roomController = {
   createRoom: catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
       const userId = req.userId;
-      const name = req.body.name || 'Untitled';
+      const name = req.body.name || "Untitled";
       const response = await roomServices.createRoom(userId, name);
 
       res.status(200).json({
@@ -20,8 +20,8 @@ export const roomController = {
     async (req: Request, res: Response, next: NextFunction) => {
       const userId = req.userId;
       const name = req.body.name;
-      const roomId = Number( req.body.roomId)
-      const response = await roomServices.updateRoom(userId, name,roomId);
+      const roomId = Number(req.body.roomId);
+      const response = await roomServices.updateRoom(userId, name, roomId);
 
       res.status(200).json({
         status: "success",
@@ -30,56 +30,77 @@ export const roomController = {
       });
     },
   ),
-  deleteRoom: catchAsync(async(req:Request,res:Response,next:NextFunction) => {
-    const userId = req.userId
-    const roomId = Number( req.body.roomId)
-    const response = await roomServices.deleteRoom(userId,roomId)
+  deleteRoom: catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const userId = req.userId;
+      const roomId = Number(req.body.roomId);
+      const response = await roomServices.deleteRoom(userId, roomId);
 
-    res.status(200).json({
-        status:"success",
-        message:"Room Deleted",
-        data:response
-    })
-  }),
-  myRooms: catchAsync(async(req:Request,res:Response,next:NextFunction) => {
-    const userId = req.userId
-    const response = await roomServices.myRooms(userId)
-    res.status(200).json({
-        status:"success",
-        message:"My Rooms",
-        data:response
-    })
-  } ),
-  getChatByRoomId: catchAsync(async(req:Request,res:Response,next:NextFunction) => {
-    const roomId = Number(req.params.roomId)
-    const userId = req.userId
-    const response = await roomServices.getChatByRoomId(userId,roomId)
-  
-   res.status(200).json({
-        status:"success",
-        message:"Room Chats",
-        data:response
-    })
-}),
-  getRoombySlug: catchAsync(async(req:Request,res:Response,next:NextFunction) => {
-    const slug = req.params.slug as string
-    const userId = req.userId
+      res.status(200).json({
+        status: "success",
+        message: "Room Deleted",
+        data: response,
+      });
+    },
+  ),
+  myRooms: catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const userId = req.userId;
+      const response = await roomServices.myRooms(userId);
+      res.status(200).json({
+        status: "success",
+        message: "My Rooms",
+        data: response,
+      });
+    },
+  ),
+  getChatByRoomId: catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const roomId = Number(req.params.roomId);
+      const userId = req.userId;
+      const response = await roomServices.getChatByRoomId(userId, roomId);
 
-    const response = await roomServices.getRoomBySlug(userId,slug)
-     res.status(200).json({
-        status:"success",
-        message:"Room By Slug",
-        data:response
-    })
-  } ),
-  getRoomShapes: catchAsync(async(req:Request,res:Response,next:NextFunction)=> {
-    const roomId =Number(req.params.roomId)
+      res.status(200).json({
+        status: "success",
+        message: "Room Chats",
+        data: response,
+      });
+    },
+  ),
+  getRoombySlug: catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const slug = req.params.slug as string;
+      const userId = req.userId;
 
-    const response = await roomServices.getRoomShapes(roomId)
-    res.status(200).json({
-        status:"success",
-        message:"Room shapes",
-        data:response
-    })
-  })
-}
+      const response = await roomServices.getRoomBySlug(userId, slug);
+      res.status(200).json({
+        status: "success",
+        message: "Room By Slug",
+        data: response,
+      });
+    },
+  ),
+  getRoomShapes: catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const roomId = Number(req.params.roomId);
+
+      const response = await roomServices.getRoomShapes(roomId);
+      res.status(200).json({
+        status: "success",
+        message: "Room shapes",
+        data: response,
+      });
+    },
+  ),
+  getRoombyId: catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+      const roomId = Number(req.params.roomId);
+      const response = await roomServices.getRoomById(roomId);
+      res.status(200).json({
+        status: "success",
+        message: "Room",
+        data: response,
+      });
+    },
+  ),
+};

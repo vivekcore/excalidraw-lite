@@ -1,7 +1,7 @@
 import { prisma } from "@repo/db";
 import { z } from "zod";
 import { GenerateSlug } from "../utils/slug.js";
-import { ValidationError, NotFoundError } from "@repo/db/error";
+import { ValidationError, NotFoundError, UnauthorizedError } from "@repo/db/error";
 class RoomServices {
   async createRoom(userId: string, name: string) {
     const zodSchema = z.object({
@@ -98,6 +98,13 @@ class RoomServices {
    
     return data
   }
+  async getRoomById(roomId:number){
+  const data =  await prisma.room.findFirst({
+      where:{id:roomId}
+    })
+    return data;
+  }
+ 
 }
 
 export const roomServices = new RoomServices();
