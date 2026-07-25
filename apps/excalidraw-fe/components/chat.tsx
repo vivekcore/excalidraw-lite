@@ -18,15 +18,15 @@ const Chat = ({
   roomId: string;
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [ServerRes, setServerRes] = useState<string[]>([]);
-  const [chats, setchats] = useState<Set<message>>(new Set());
+  const [ServerRes, setServerRes] = useState<Set<message>>(new Set());
+
   const LogedUser = localStorage.getItem("userId") as string;
   useEffect(() => {
     const FetchChats = async () => {
       const chats = await api.get(`${BACKEND_URL}/room/chats/${roomId}`);
       const data = chats.data.data as [];
       data.forEach((val: message) => {
-        setchats((prev) =>
+        setServerRes((prev) =>
           new Set(prev).add({ userId: val.userId, message: val.message }),
         );
       });
@@ -36,7 +36,9 @@ const Chat = ({
 
   useEffect(() => {
     const unsub = subscribe("chat", (data) => {
-      setServerRes((prev) => [...prev, data.message as string]);
+      setServerRes((prev) =>
+          new Set(prev).add({ userId: data.userId as string, message: data.message as string }),
+        );
     });
     return unsub;
   }, [subscribe]);
@@ -52,9 +54,10 @@ const Chat = ({
       roomId,
     };
     sendMessage(JSON.stringify(data));
-    setchats((prev) =>
-      new Set(prev).add({ userId: LogedUser, message: message }),
-    );
+      setServerRes((prev) =>
+          new Set(prev).add({ userId: LogedUser, message, }),
+        )
+  
     
   };
   return (
@@ -72,26 +75,15 @@ const Chat = ({
       </div>
 
       <div className="min-h-24 flex-1 space-y-2 overflow-y-auto pr-1">
-        {chats.size === 0 ? (
-          <div className="border-2 border-dashed border-(--pixel-line) bg-[#0f1320] p-3 font-mono text-xs font-bold uppercase text-(--pixel-muted)">
-            No messages
-          </div>
-        ) : (
-          <ul>
-            {[...chats.values()].map((val, idx) => (
-              <li key={idx}>{val.message}</li>
-            ))}
-          </ul>
-        )}
-        {ServerRes.length === 0 ? (
+        {ServerRes.size === 0 ? (
           <div></div>
         ) : (
-          ServerRes.map((data, index) => (
+          [...ServerRes.values()].map((data, index) => (
             <div
               className="border-2 border-(--pixel-line) bg-[#0f1320] px-3 py-2 text-sm text-(--pixel-text) shadow-[3px_3px_0_var(--pixel-ink)]"
               key={index}
             >
-              {data}
+              {data.message}
             </div>
           ))
         )}
