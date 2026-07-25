@@ -21,8 +21,9 @@ const Page = () => {
   const {status} = useWebSocket()
   const onSubmit = async (data: { roomId: string }) => {
     try {
-      const response = await api.get(`/room/chats/${data.roomId}`);
-      if (response.status === 200 && status === 'open') {
+      const response = await api.get(`/room/find/${data.roomId}`);
+      if (response.data.data !== null && status === 'open') {
+        localStorage.setItem('adminId',response.data.data.adminId)
         router.push(`/canvas/${data.roomId}`);
       }
       

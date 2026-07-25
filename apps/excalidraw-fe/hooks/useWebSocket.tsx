@@ -16,10 +16,10 @@ export const useWebSocket = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const listnerRef = useRef<Map<string, Set<Listener>>>(new Map());
+  
   const token = getToken();
 
   const connect = useCallback(() => {
-    
     const ws = new WebSocket(WS_URL);
     wsRef.current = ws;
 
@@ -35,7 +35,6 @@ export const useWebSocket = () => {
         console.log(response.message);
         return;
       }
-
       const topicListeners = listnerRef.current.get(response.type);
       topicListeners?.forEach((fn) => fn(response));
     };

@@ -7,7 +7,8 @@ const CanvasServer = async ({params}:{
   }
 }) => {
   const roomId = (await params).roomId
-  return <RoomCanvas roomId={roomId}/>
+  
+  return <RoomCanvas key={roomId} roomId={roomId}/>
 
  
 };

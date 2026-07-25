@@ -50,6 +50,10 @@ export class Game {
       this.existingShapes.push(parserShape);
       this.ClearCanvas();
     });
+    this.ussub = this.subscribe("shape:deleteAll", () => {
+      this.existingShapes = [];
+      this.ClearCanvas()
+    })
   }
   async init() {
     this.canvas.width = window.innerWidth;
@@ -64,6 +68,7 @@ export class Game {
     this.ClearCanvas();
   }
   ClearCanvas() {
+    console.log("clear canvas called")
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.forEach((shape) => {
       this.drawShapes(shape);

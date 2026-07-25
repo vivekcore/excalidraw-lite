@@ -1,5 +1,6 @@
 "use client";
 import {
+  ArrowBigLeft,
   Check,
   Copy,
   Ellipse,
@@ -8,12 +9,15 @@ import {
   Paintbrush,
   Pencil,
   RectangleHorizontal,
+  Trash,
   Triangle,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Tshape } from "@/draw/types";
 import { Game } from "@/draw/Game";
 import { Listener } from "@/hooks/useWebSocket";
+import Warning from "./warning";
+import { useRouter } from "next/navigation";
 
 export default function Canvas({
   roomId,
@@ -29,7 +33,19 @@ export default function Canvas({
   const colorref = useRef<string>(color);
   const [shape, setShape] = useState<Tshape>(null);
   const [copied, setCopied] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const shapeRef = useRef<Tshape>(null);
+  const router = useRouter();
+  const [isAdmin] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const adminId = localStorage.getItem("adminId");
+    const userId = localStorage.getItem("userId");
+    if (adminId === userId) {
+      return true;
+    } else {
+      return false;
+    }
+  });
 
   useEffect(() => {
     colorref.current = color;
@@ -106,6 +122,20 @@ export default function Canvas({
     const color = e.target.value;
     setColor(color);
   };
+  const handleClearCanvas = () => {
+    try {
+      sendMessage(
+        JSON.stringify({
+          type: "shape:deleteAll",
+          roomId: roomId,
+        }),
+      );
+      // await api.post(`${BACKEND_URL}/room/canvas/clear/${roomId}`);
+      setShowConfirm(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const tools = [
     { id: null, icon: MousePointer, label: "Select (V / 1)" },
     { id: "rectangle", icon: RectangleHorizontal, label: "Rectangle (R / 2)" },
@@ -128,7 +158,7 @@ export default function Canvas({
             Stroke
           </label>
           <input
-            className="h-10 w-full cursor-pointer border-2 border-[var(--pixel-line)] bg-[#0f1320] p-1 shadow-[3px_3px_0_var(--pixel-ink)]"
+            className="h-10 w-full cursor-pointer border-2 border-(--pixel-line) bg-[#0f1320] p-1 shadow-[3px_3px_0_var(--pixel-ink)]"
             onChange={handleChange}
             value={color}
             type="color"
@@ -138,15 +168,15 @@ export default function Canvas({
       </div>
 
       <div className="pixel-panel fixed left-1/2 top-4 z-50 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-col gap-3 p-2 sm:top-6 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-2 border-b-2 border-[var(--pixel-line)] px-2 pb-2 sm:border-b-0 sm:border-r-2 sm:pb-0 sm:pr-4">
-          <div className="grid h-9 w-9 place-items-center border-2 border-[var(--pixel-cyan)] bg-[#0f1320] shadow-[3px_3px_0_var(--pixel-ink)]">
-            <Paintbrush className="h-4 w-4 animate-pulse text-[var(--pixel-cyan)]" />
+        <div className="flex items-center gap-2 border-b-2 border-(--pixel-line) px-2 pb-2 sm:border-b-0 sm:border-r-2 sm:pb-0 sm:pr-4">
+          <div className="grid h-9 w-9 place-items-center border-2 border-(--pixel-cyan) bg-[#0f1320] shadow-[3px_3px_0_var(--pixel-ink)]">
+            <Paintbrush className="h-4 w-4 animate-pulse text-(--pixel-cyan)" />
           </div>
           <div className="flex flex-col">
-            <span className="font-mono text-xs font-black uppercase leading-none text-[var(--pixel-text)]">
+            <span className="font-mono text-xs font-black uppercase leading-none text-(--pixel-text)">
               ExcaliDraw
             </span>
-            <span className="mt-1 font-mono text-[10px] font-black uppercase leading-none text-[var(--pixel-yellow)]">
+            <span className="mt-1 font-mono text-[10px] font-black uppercase leading-none text-(--pixel-yellow)">
               Lite
             </span>
           </div>
@@ -161,9 +191,7 @@ export default function Canvas({
                 <button
                   onClick={() => setShape(tool.id)}
                   className={`pixel-tool flex h-9 w-9 items-center justify-center ${
-                    isActive
-                      ? "pixel-tool-active"
-                      : "text-[var(--pixel-muted)]"
+                    isActive ? "pixel-tool-active" : "text-(--pixel-muted)]"
                   }`}
                   aria-label={tool.label}
                   title={tool.label}
@@ -171,7 +199,7 @@ export default function Canvas({
                   <IconComponent className="h-4 w-4 stroke-2" />
                 </button>
 
-                <div className="pointer-events-none absolute left-1/2 top-full z-50 mt-3 -translate-x-1/2 scale-95 whitespace-nowrap border-2 border-[var(--pixel-line)] bg-[#0f1320] px-2 py-1.5 font-mono text-[10px] font-black uppercase text-[var(--pixel-text)] opacity-0 shadow-[3px_3px_0_var(--pixel-ink)] transition-all duration-150 group-hover:scale-100 group-hover:opacity-100">
+                <div className="pointer-events-none absolute left-1/2 top-full z-50 mt-3 -translate-x-1/2 scale-95 whitespace-nowrap border-2 border-(--pixel-line)] bg-[#0f1320] px-2 py-1.5 font-mono text-[10px] font-black uppercase text-(--pixel-text)] opacity-0 shadow-[3px_3px_0_var(--pixel-ink)] transition-all duration-150 group-hover:scale-100 group-hover:opacity-100">
                   {tool.label}
                 </div>
               </div>
@@ -179,24 +207,74 @@ export default function Canvas({
           })}
         </div>
 
-        <div className="border-t-2 border-[var(--pixel-line)] pt-2 sm:border-l-2 sm:border-t-0 sm:pl-3 sm:pt-0">
+        <div className="border-t-2 border-(--pixel-line)] pt-2 sm:border-l-2 sm:border-t-0 sm:pl-3 sm:pt-0">
           <button
             onClick={handleCopyRoomId}
             className="pixel-button max-w-full px-3 py-2 text-xs"
             title="Click to copy Room ID"
           >
-            <span className="h-2 w-2 animate-pulse bg-[var(--pixel-green)]" />
+            <span className="h-2 w-2 animate-pulse bg-(--pixel-green)]" />
             <span className="hidden sm:inline">Room</span>
-            <span className="max-w-28 truncate font-mono select-all text-[var(--pixel-text)] sm:max-w-40">
+            <span className="max-w-28 truncate font-mono select-all text-(--pixel-text)] sm:max-w-40">
               {roomId}
             </span>
             {copied ? (
-              <Check className="h-3.5 w-3.5 text-[var(--pixel-green)]" />
+              <Check className="h-3.5 w-3.5 text-(--pixel-green)]" />
             ) : (
-              <Copy className="h-3.5 w-3.5 text-[var(--pixel-cyan)]" />
+              <Copy className="h-3.5 w-3.5 text-(--pixel-cyan)]" />
             )}
           </button>
         </div>
+      </div>
+      <div className="absolute top-8 right-10">
+        {isAdmin ? (
+          <div className="group relative inline-block">
+            <button
+              className=" p-2 pixel-button "
+              onClick={() => setShowConfirm(true)}
+              type="button"
+            >
+              <p className="hidden md:block"> Clear Canvas </p>
+              <Trash size={16} />
+            </button>
+          </div>
+        ) : (
+          <div className="group relative inline-block">
+            <button
+              disabled
+              className="cursor-not-allowed p-2 pixel-button opacity-50"
+              onClick={() => setShowConfirm(true)}
+              type="button"
+            >
+              <p className="hidden md:block"> Clear Canvas </p>
+              <Trash size={16} />
+            </button>
+
+            <div className="absolute left-1/2  top-full mt-2 hidden -translate-x-1/2 rounded text-nowrap bg-gray-900 px-2 py-1 text-xs text-white group-hover:block">
+              Only admin can clear canvas
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="absolute top-8 left-10">
+        <button
+          onClick={() => router.push("/room")}
+          className="pixel-button p-2"
+        >
+          <ArrowBigLeft size={16} />
+          <p>Back</p>
+        </button>
+      </div>
+      <div>
+        <Warning
+          isOpen={showConfirm}
+          title="Delete Item?"
+          message="This action cannot be undone. Are you sure you want to Clear this Canvas?"
+          onConfirm={handleClearCanvas}
+          onCancel={() => setShowConfirm(false)}
+          confirmLabel="Delete"
+          isDangerous={true}
+        />
       </div>
     </>
   );

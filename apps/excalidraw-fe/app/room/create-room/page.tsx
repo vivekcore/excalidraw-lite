@@ -20,6 +20,7 @@ const Page = () => {
   const onSubmit = async (data: { name: string }) => {
     const response = await api.post("/room/create-room", data);
     const roomId = response.data.data.id;
+    localStorage.setItem('adminId',response.data.data.adminId)
     router.push(`/canvas/${roomId}`);
   };
   return (
@@ -43,10 +44,10 @@ const Page = () => {
               <PlusSquare className="h-4 w-4" />
               New board
             </p>
-            <h1 className="pixel-title mt-4 text-3xl font-black uppercase text-[var(--pixel-yellow)] sm:text-5xl">
+            <h1 className="pixel-title mt-4 text-3xl font-black uppercase text-(--pixel-yellow) sm:text-5xl">
               Create room
             </h1>
-            <p className="mt-3 text-sm leading-6 text-[var(--pixel-muted)]">
+            <p className="mt-3 text-sm leading-6 text-(--pixel-muted)">
               Name the room and jump straight to the shared canvas.
             </p>
           </div>
