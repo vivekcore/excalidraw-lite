@@ -1,4 +1,4 @@
-import { broadcastToRoom } from "../utils/broadcast";
+import { broadcastToAll, broadcastToRoom } from "../utils/broadcast";
 import { connectionStore } from "../store";
 import { WebSocket } from "ws";
 import { mainQueue } from "../config/Queue";
@@ -84,4 +84,23 @@ export const ShapeHandler = {
       console.error("shape:delete error:", error);
     }
   },
+  deleteAll: async(ws: WebSocket, msg: any)  => {
+    const conn = connectionStore.get(ws)
+    const data = {
+      roomId: msg.roomId,
+      adminId: conn?.userId,
+    }
+      await mainQueue.add("deleteAll", data, {
+        attempts: 3,
+        backoff: { type: "exponential", delay: 500 },
+        removeOnComplete: true,
+        removeOnFail: false,
+      });
+
+       broadcastToAll(
+        String(msg.roomId),
+        { type: "shape:deleteAll",status:"Canvas cleared"},
+      );
+      
+  }
 };

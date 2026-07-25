@@ -15,6 +15,7 @@ const handlers: Record<string, (ws: WebSocket, msg: any) => Promise<void> | void
   "shape:create": ShapeHandler.createShape,
   "shape:update": ShapeHandler.updateShape,
   "shape:delete": ShapeHandler.deleteShape,
+  "shape:deleteAll": ShapeHandler.deleteAll,
 };
 
 wss.on("connection", (ws) => {

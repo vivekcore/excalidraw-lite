@@ -40,6 +40,20 @@ const worker = new Worker(
           },
         });
         break;
+      case "deleteAll": 
+        await prisma.room.update({
+          where:{
+            adminId: job.data.adminId,
+            id: Number(job.data.roomId)
+          },
+          data:{
+            shapes:{
+              deleteMany:{
+                roomId: Number(job.data.roomId)
+              }
+            }
+          }
+        })
       default:
         break;
     }
