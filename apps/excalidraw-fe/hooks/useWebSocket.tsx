@@ -4,11 +4,7 @@ import { getToken } from "@/utils/token";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export type SocketMessage = {
-<<<<<<< HEAD
-  type: string
-=======
   type: string;
->>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
   [key: string]:unknown
 };
 
@@ -34,12 +30,7 @@ export const useWebSocket = () => {
     };
 
     ws.onmessage = (event) => {
-<<<<<<< HEAD
-      const response = event.data
-      console.log(response)
-=======
       const response = JSON.parse(event.data)
->>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
       if (response.type === "error") {
         console.log(response.message);
         return;

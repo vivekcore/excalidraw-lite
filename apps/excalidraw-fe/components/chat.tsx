@@ -18,40 +18,37 @@ const Chat = ({
   roomId: string;
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-<<<<<<< HEAD
-  const [ServerRes, setServerRes] = useState<string[]>([]);
-  const [chats, setchats] = useState<Set<message>>(new Set());
-=======
   const [ServerRes, setServerRes] = useState<Set<message>>(new Set());
 
->>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
   const LogedUser = localStorage.getItem("userId") as string;
   useEffect(() => {
-    const FetchChats = async () => {
-      const chats = await api.get(`${BACKEND_URL}/room/chats/${roomId}`);
-      const data = chats.data.data as [];
-      data.forEach((val: message) => {
-<<<<<<< HEAD
-        setchats((prev) =>
-=======
-        setServerRes((prev) =>
->>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
-          new Set(prev).add({ userId: val.userId, message: val.message }),
+    const fetchChats = async () => {
+      try {
+        const chats = await api.get(`${BACKEND_URL}/room/chats/${roomId}`);
+        const data = chats.data.data as message[];
+        setServerRes(
+          new Set(
+            data.map((val) => ({
+              userId: val.userId,
+              message: val.message,
+            })),
+          ),
         );
-      });
+      } catch (error) {
+        console.error("Failed to fetch chats", error);
+      }
     };
-    FetchChats();
+
+    if (roomId) {
+      fetchChats();
+    }
   }, [roomId]);
 
   useEffect(() => {
     const unsub = subscribe("chat", (data) => {
-<<<<<<< HEAD
-      setServerRes((prev) => [...prev, JSON.stringify(data.message)]);
-=======
       setServerRes((prev) =>
           new Set(prev).add({ userId: data.userId as string, message: data.message as string }),
         );
->>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
     });
     return unsub;
   }, [subscribe]);
@@ -67,16 +64,10 @@ const Chat = ({
       roomId,
     };
     sendMessage(JSON.stringify(data));
-<<<<<<< HEAD
-    setchats((prev) =>
-      new Set(prev).add({ userId: LogedUser, message: message }),
-    );
-=======
       setServerRes((prev) =>
           new Set(prev).add({ userId: LogedUser, message, }),
         )
   
->>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
     
   };
   return (
@@ -94,37 +85,15 @@ const Chat = ({
       </div>
 
       <div className="min-h-24 flex-1 space-y-2 overflow-y-auto pr-1">
-<<<<<<< HEAD
-        {chats.size === 0 ? (
-          <div className="border-2 border-dashed border-(--pixel-line) bg-[#0f1320] p-3 font-mono text-xs font-bold uppercase text-(--pixel-muted)">
-            No messages
-          </div>
-        ) : (
-          <ul>
-            {[...chats.values()].map((val, idx) => (
-              <li key={idx}>{val.message}</li>
-            ))}
-          </ul>
-        )}
-        {ServerRes.length === 0 ? (
-          <div></div>
-        ) : (
-          ServerRes.map((data, index) => (
-=======
         {ServerRes.size === 0 ? (
           <div></div>
         ) : (
           [...ServerRes.values()].map((data, index) => (
->>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
             <div
               className="border-2 border-(--pixel-line) bg-[#0f1320] px-3 py-2 text-sm text-(--pixel-text) shadow-[3px_3px_0_var(--pixel-ink)]"
               key={index}
             >
-<<<<<<< HEAD
-              {data}
-=======
               {data.message}
->>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
             </div>
           ))
         )}
