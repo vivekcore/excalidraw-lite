@@ -46,8 +46,12 @@ export class Game {
   }
   socketMessage() {
     this.ussub = this.subscribe("shape:create", (data) => {
+<<<<<<< HEAD
       // console.log(data)
       const parserShape = JSON.parse(data.shape as string);
+=======
+      const parserShape = JSON.parse(data.shape as string)
+>>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
       this.existingShapes.push(parserShape);
       this.ClearCanvas();
     });

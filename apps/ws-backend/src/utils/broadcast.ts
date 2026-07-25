@@ -5,6 +5,10 @@ export function broadcastToRoom(roomId: string, message: object, excludeSender?:
     const connections = connectionStore.getByRoom(roomId)
     for (const conn of connections) {
         if (conn.ws !== excludeSender) {
+<<<<<<< HEAD
+=======
+            console.log(message)
+>>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
             conn.ws.send(JSON.stringify(message))
         }
     }

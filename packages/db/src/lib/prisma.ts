@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import dns from 'dns';
 dns.setDefaultResultOrder('ipv4first');
+=======
+
+>>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
 import { neonConfig } from '@neondatabase/serverless'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import ws from 'ws'

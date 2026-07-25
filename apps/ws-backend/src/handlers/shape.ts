@@ -15,7 +15,10 @@ export const ShapeHandler = {
         userId: conn.userId,
         data: msg.shape,
       };
+<<<<<<< HEAD
       console.log(data)
+=======
+>>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
       const res = await mainQueue.add("create-shape", data, {
         attempts: 3,
         backoff: { type: "exponential", delay: 500 },
@@ -23,9 +26,16 @@ export const ShapeHandler = {
         removeOnFail: false,
       });
 
+<<<<<<< HEAD
       broadcastToRoom(
         String(res.data.roomId),
         { type: "shape:create", shape: res.data.shape },
+=======
+
+      broadcastToRoom(
+        String(msg.roomId),
+        { type: "shape:create", shape: msg.shape },
+>>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
         ws,
       );
     } catch (error) {
@@ -51,8 +61,13 @@ export const ShapeHandler = {
       });
 
       broadcastToRoom(
+<<<<<<< HEAD
         String(res.data.roomId),
         { type: "shape:update", shapeId: res.data.id, shape: res.data.shape },
+=======
+        String(msg.roomId),
+        { type: "shape:update", shapeId: msg.shapeId, shape: msg.shape },
+>>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
         ws,
       );
     } catch (error) {
@@ -77,7 +92,11 @@ export const ShapeHandler = {
       });
       broadcastToRoom(
         String(res.data.roomId),
+<<<<<<< HEAD
         { type: "shape:delete", shapeId: res.data.id },
+=======
+        { type: "shape:delete", shapeId: msg.shapeId },
+>>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
         ws,
       );
     } catch (error) {
