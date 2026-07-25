@@ -9,8 +9,10 @@ import {
   Paintbrush,
   Pencil,
   RectangleHorizontal,
+  Redo,
   Trash,
   Triangle,
+  Undo,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Tshape } from "@/draw/types";
@@ -28,14 +30,16 @@ export default function Canvas({
   sendMessage: (data: string) => void;
   subscribe: (topic: string, fn: Listener) => () => void;
 }) {
-  const cnavasref = useRef<HTMLCanvasElement>(null);
   const [color, setColor] = useState<string>("#FFFF00");
-  const colorref = useRef<string>(color);
   const [shape, setShape] = useState<Tshape>(null);
   const [copied, setCopied] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const shapeRef = useRef<Tshape>(null);
+  const colorref = useRef<string>(color);
+  const cnavasref = useRef<HTMLCanvasElement>(null);
+  const gameRef = useRef<Game>(null);
   const router = useRouter();
+  const [len, setLen] = useState<number | undefined>();
   const [isAdmin] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     const adminId = localStorage.getItem("adminId");
@@ -46,6 +50,12 @@ export default function Canvas({
       return false;
     }
   });
+
+  useEffect(() => {
+    const length = gameRef.current?.getExistingShapeslen();
+    setLen(length);
+    console.log(length);
+  }, [shape]);
 
   useEffect(() => {
     colorref.current = color;
@@ -65,6 +75,7 @@ export default function Canvas({
         subscribe,
         sendMessage,
       );
+      gameRef.current = game;
       return () => game.destroy();
     }
   }, [roomId, sendMessage, subscribe]);
@@ -77,7 +88,6 @@ export default function Canvas({
       ) {
         return;
       }
-
       const key = e.key.toLowerCase();
       switch (key) {
         case "v":
@@ -104,7 +114,6 @@ export default function Canvas({
           break;
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
@@ -130,7 +139,6 @@ export default function Canvas({
           roomId: roomId,
         }),
       );
-      // await api.post(`${BACKEND_URL}/room/canvas/clear/${roomId}`);
       setShowConfirm(false);
     } catch (error) {
       console.log(error);
@@ -265,6 +273,42 @@ export default function Canvas({
           <p>Back</p>
         </button>
       </div>
+      {len == 0 ? (
+        <div className="absolute opacity-50 pointer-events-none bottom-6 left-8">
+          <button
+            disabled={true}
+            onClick={() => gameRef.current?.undo()}
+            className="pixel-button p-1"
+          >
+            <Undo />
+          </button>
+          <button
+            disabled={true}
+            onClick={() => gameRef.current?.redo()}
+            className="pixel-button p-1"
+          >
+            <Redo />
+          </button>
+        </div>
+      ) : (
+        <div>
+          <div className="absolute bottom-6 left-8">
+            <button
+              onClick={() => gameRef.current?.undo()}
+              className="pixel-button p-1"
+            >
+              <Undo />
+            </button>
+            <button
+              onClick={() => gameRef.current?.redo()}
+              className="pixel-button p-1"
+            >
+              <Redo />
+            </button>
+          </div>
+        </div>
+      )}
+
       <div>
         <Warning
           isOpen={showConfirm}

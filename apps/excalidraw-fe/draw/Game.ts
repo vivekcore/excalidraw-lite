@@ -4,9 +4,13 @@ import { Tshape } from "./types";
 import { Listener } from "@/hooks/useWebSocket";
 
 export class Game {
+
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private existingShapes: Shapes[];
+  private history: Shapes[];
+  private shapeCount: number;
+  private maxHistory: number;
   private roomId: string;
   private strokeColor: { current: string };
   private shapeKind: { current: Tshape };
@@ -31,6 +35,9 @@ export class Game {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.existingShapes = [];
+    this.history = [];
+    this.shapeCount = 0;
+    this.maxHistory = 50;
     this.roomId = roomId;
     this.strokeColor = strokeColor;
     this.shapeKind = shapeKind;
@@ -46,34 +53,38 @@ export class Game {
   }
   socketMessage() {
     this.ussub = this.subscribe("shape:create", (data) => {
-      const parserShape = JSON.parse(data.shape as string)
+      const parserShape = JSON.parse(data.shape as string);
       this.existingShapes.push(parserShape);
       this.ClearCanvas();
     });
     this.ussub = this.subscribe("shape:deleteAll", () => {
       this.existingShapes = [];
-      this.ClearCanvas()
-    })
+      this.ClearCanvas();
+    });
   }
+
   async init() {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     if (!this.ctx) return;
 
     this.existingShapes = await this.getShapes();
+    this.shapeCount = this.existingShapes.length;
     if (this.destroyed) return;
 
     this.ctx.fillStyle = "black";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ClearCanvas();
   }
+
+ 
   ClearCanvas() {
-    console.log("clear canvas called")
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.forEach((shape) => {
       this.drawShapes(shape);
     });
   }
+
   drawShapes(shape: Shapes) {
     this.ctx.beginPath();
     switch (shape.type) {
@@ -109,6 +120,7 @@ export class Game {
         break;
     }
     this.ctx.stroke();
+
   }
   async getShapes() {
     try {
@@ -256,6 +268,7 @@ export class Game {
       shape: JSON.stringify(shape),
     });
     this.sendMessage(data);
+    
   }
   BroadCastEllipse(width: number, height: number) {
     const centerX = this.startX + width / 2;
@@ -279,6 +292,7 @@ export class Game {
       shape: JSON.stringify(shape),
     });
     this.sendMessage(data);
+    
   }
   BroadCastLine(offsetX: number, offsetY: number) {
     const shape: Shapes = {
@@ -296,6 +310,7 @@ export class Game {
       shape: JSON.stringify(shape),
     });
     this.sendMessage(data);
+    
   }
   BroadCastTriangle(offsetX: number, offsetY: number) {
     const shape: Shapes = {
@@ -313,5 +328,37 @@ export class Game {
       shape: JSON.stringify(shape),
     });
     this.sendMessage(data);
+    
+  }
+
+  //functionalities
+
+   undo() {
+    const popped = this.existingShapes.pop();
+    if(!popped) return;
+    this.history.push(popped);
+    this.ClearCanvas();
+    const data = {
+      type:"shape:undo",
+      shape:popped,
+      roomId:this.roomId,
+    }
+    this.sendMessage(JSON.stringify(data));
+  }
+  redo() {
+    const popped = this.history.pop();
+    if(!popped) return;
+    this.existingShapes.push(popped);
+    this.ClearCanvas();
+    const data = {
+      type:"shape:redo",
+      shape:popped,
+      roomId:this.roomId,
+    }
+    this.sendMessage(JSON.stringify(data));
+  }
+
+  getExistingShapeslen(){
+    return this.shapeCount;
   }
 }
