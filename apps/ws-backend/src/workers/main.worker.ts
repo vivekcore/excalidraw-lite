@@ -54,6 +54,15 @@ const worker = new Worker(
             }
           }
         })
+        break;
+      case "undo":
+        await prisma.shape.deleteMany({
+          where: {
+            data: job.data.shape,
+            roomId: Number(job.data.roomId)
+          }
+        })
+        break;
       default:
         break;
     }

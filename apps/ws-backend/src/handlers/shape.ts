@@ -102,5 +102,17 @@ export const ShapeHandler = {
         { type: "shape:deleteAll",status:"Canvas cleared"},
       );
       
+  },
+  redo: async (ws:WebSocket,msg:any) => {
+    const data = {
+      shapeId: msg.shape,
+      roomId: msg.roomId,
+    }
+    await mainQueue.add("undo", data, {
+        attempts: 3,
+        backoff: { type: "exponential", delay: 500 },
+        removeOnComplete: true,
+        removeOnFail: false,
+      });
   }
 };
