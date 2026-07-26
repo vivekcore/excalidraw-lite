@@ -1,6 +1,5 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/98f6e3bf-1c2c-4d21-82dd-3c8906a640f6">
-  <img alt="Excalidraw" src="https://github.com/user-attachments/assets/98f6e3bf-1c2c-4d21-82dd-3c8906a640f6">
+  <img alt="Excalidraw" src="apps/excalidraw-fe/public/image.png">
 </picture>
 
 <div align="center">
@@ -39,16 +38,16 @@ A real-time collaborative drawing application that lets multiple users draw on a
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | Next.js 16, React 19, Tailwind CSS v4 |
-| **REST API** | Express 5 |
-| **WebSockets** | ws (Node.js) |
-| **Auth** | JSON Web Tokens (JWT) |
-| **Validation** | Zod v4 |
-| **Database** | PostgreSQL (Neon + Prisma ORM v7) |
-| **Language** | TypeScript (100%) |
-| **Monorepo** | Turborepo v2 + pnpm v9 |
+| Layer          | Technology                            |
+| -------------- | ------------------------------------- |
+| **Frontend**   | Next.js 16, React 19, Tailwind CSS v4 |
+| **REST API**   | Express 5                             |
+| **WebSockets** | ws (Node.js)                          |
+| **Auth**       | JSON Web Tokens (JWT)                 |
+| **Validation** | Zod v4                                |
+| **Database**   | PostgreSQL (Neon + Prisma ORM v7)     |
+| **Language**   | TypeScript (100%)                     |
+| **Monorepo**   | Turborepo v2 + pnpm v9                |
 
 ## Architecture
 
@@ -86,6 +85,7 @@ pnpm install
 Create `.env` files for each app and package that requires them:
 
 **`apps/http-backend/.env`**
+
 ```
 DATABASE_URL=postgresql://...
 JWT_SECRET=your-secret-key
@@ -93,6 +93,7 @@ PORT=8000
 ```
 
 **`apps/ws-backend/.env`**
+
 ```
 DATABASE_URL=postgresql://...
 JWT_SECRET=your-secret-key
@@ -118,6 +119,7 @@ pnpm dev
 ```
 
 This starts:
+
 - **Frontend** → [http://localhost:4000](http://localhost:4000)
 - **HTTP Backend** → [http://localhost:8000](http://localhost:8000)
 - **WebSocket Backend** → ws://localhost:8080
