@@ -4,7 +4,6 @@ import { Tshape } from "./types";
 import { Listener } from "@/hooks/useWebSocket";
 
 export class Game {
-
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private existingShapes: Shapes[];
@@ -53,19 +52,28 @@ export class Game {
   }
   socketMessage() {
     this.ussub = this.subscribe("shape:create", (data) => {
-      const parserShape = JSON.parse(data.shape as string) 
+      const parserShape = JSON.parse(data.shape as string);
       this.existingShapes.push(parserShape);
       this.ClearCanvas();
+    });
+    this.ussub = this.subscribe("shape:delete", (data) => {
+      {
+        const shapeId = data.shapeId;
+        this.existingShapes = this.existingShapes.filter(
+          (e) => e.id !== shapeId,
+        );
+        this.ClearCanvas();
+      }
     });
     this.ussub = this.subscribe("shape:deleteAll", () => {
       this.existingShapes = [];
       this.ClearCanvas();
     });
     this.ussub = this.subscribe("shape:freehand", (data) => {
-      const parsed = (data.shape as Shapes);
-      this.existingShapes.push(parsed)
-      this.ClearCanvas()
-    })
+      const parsed = data.shape as Shapes;
+      this.existingShapes.push(parsed);
+      this.ClearCanvas();
+    });
   }
 
   async init() {
@@ -73,7 +81,7 @@ export class Game {
     this.canvas.height = window.innerHeight;
     if (!this.ctx) return;
 
-    this.existingShapes = await this.getShapes()
+    this.existingShapes = await this.getShapes();
     this.shapeCount = this.existingShapes.length;
     if (this.destroyed) return;
 
@@ -82,7 +90,6 @@ export class Game {
     this.ClearCanvas();
   }
 
- 
   ClearCanvas() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.forEach((shape) => {
@@ -125,14 +132,13 @@ export class Game {
         break;
     }
     this.ctx.stroke();
-
   }
   async getShapes() {
     try {
       const response = await api.get(`/room/shapes/${this.roomId}`);
       const data = response.data.data as [];
-      const parse:unknown = data.map((e:ApiRes) => (e.data));
-      return parse as Shapes[]
+      const parse: unknown = data.map((e: ApiRes) => e.data);
+      return parse as Shapes[];
     } catch (error) {
       console.log(JSON.stringify(error));
       return [];
@@ -259,9 +265,9 @@ export class Game {
     const data = JSON.stringify({
       type: "shape:freehand",
       roomId: this.roomId,
-      shape: JSON.stringify(shape)
-    })
-    this.sendMessage(data)
+      shape: JSON.stringify(shape),
+    });
+    this.sendMessage(data);
   }
 
   BroadCastRectangle(width: number, height: number) {
@@ -281,7 +287,6 @@ export class Game {
       shape: JSON.stringify(shape),
     });
     this.sendMessage(data);
-    
   }
   BroadCastEllipse(width: number, height: number) {
     const centerX = this.startX + width / 2;
@@ -306,7 +311,6 @@ export class Game {
       shape: JSON.stringify(shape),
     });
     this.sendMessage(data);
-    
   }
   BroadCastLine(offsetX: number, offsetY: number) {
     const shape: Shapes = {
@@ -325,7 +329,6 @@ export class Game {
       shape: JSON.stringify(shape),
     });
     this.sendMessage(data);
-    
   }
   BroadCastTriangle(offsetX: number, offsetY: number) {
     const shape: Shapes = {
@@ -344,37 +347,38 @@ export class Game {
       shape: JSON.stringify(shape),
     });
     this.sendMessage(data);
-    
   }
 
   //functionalities
 
-   undo() {
+  undo() {
     const popped = this.existingShapes.pop();
-    if(!popped) return;
+    if (!popped) return;
     this.history.push(popped);
     this.ClearCanvas();
+    if (popped.type === "pencil") return;
     const data = {
-      type:"shape:delete",
-      shape:popped,
-      roomId:this.roomId,
-    }
+      type: "shape:delete",
+      shape: popped,
+      roomId: this.roomId,
+    };
     this.sendMessage(JSON.stringify(data));
   }
   redo() {
     const popped = this.history.pop();
-    if(!popped) return;
+    if (!popped) return;
     this.existingShapes.push(popped);
     this.ClearCanvas();
+    if (popped.type === "pencil") return;
     const data = {
-      type:"shape:redo",
-      shape:popped,
-      roomId:this.roomId,
-    }
+      type: "shape:create",
+      shape: JSON.stringify(popped),
+      roomId: this.roomId,
+    };
     this.sendMessage(JSON.stringify(data));
   }
 
-  getExistingShapeslen(){
+  getExistingShapeslen() {
     return this.shapeCount;
   }
 }
