@@ -54,7 +54,6 @@ export default function Canvas({
   useEffect(() => {
     const length = gameRef.current?.getExistingShapeslen();
     setLen(length);
-    console.log(length);
   }, [shape]);
 
   useEffect(() => {
@@ -273,7 +272,7 @@ export default function Canvas({
           <p>Back</p>
         </button>
       </div>
-      {len == 0 ? (
+      {/* {len == 0 ? (
         <div className="absolute opacity-50 pointer-events-none bottom-6 left-8">
           <button
             disabled={true}
@@ -307,8 +306,23 @@ export default function Canvas({
             </button>
           </div>
         </div>
-      )}
-
+      )} */}
+<div>
+          <div className="absolute bottom-6 left-8">
+            <button
+              onClick={() => gameRef.current?.undo()}
+              className="pixel-button p-1"
+            >
+              <Undo />
+            </button>
+            <button
+              onClick={() => gameRef.current?.redo()}
+              className="pixel-button p-1"
+            >
+              <Redo />
+            </button>
+          </div>
+        </div>
       <div>
         <Warning
           isOpen={showConfirm}

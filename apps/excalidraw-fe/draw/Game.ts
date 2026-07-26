@@ -53,7 +53,7 @@ export class Game {
   }
   socketMessage() {
     this.ussub = this.subscribe("shape:create", (data) => {
-      const parserShape = JSON.parse(data.shape as string);
+      const parserShape = JSON.parse(data.shape as string) 
       this.existingShapes.push(parserShape);
       this.ClearCanvas();
     });
@@ -61,6 +61,11 @@ export class Game {
       this.existingShapes = [];
       this.ClearCanvas();
     });
+    this.ussub = this.subscribe("shape:freehand", (data) => {
+      const parsed = (data.shape as Shapes);
+      this.existingShapes.push(parsed)
+      this.ClearCanvas()
+    })
   }
 
   async init() {
@@ -68,7 +73,7 @@ export class Game {
     this.canvas.height = window.innerHeight;
     if (!this.ctx) return;
 
-    this.existingShapes = await this.getShapes();
+    this.existingShapes = await this.getShapes()
     this.shapeCount = this.existingShapes.length;
     if (this.destroyed) return;
 
@@ -126,8 +131,8 @@ export class Game {
     try {
       const response = await api.get(`/room/shapes/${this.roomId}`);
       const data = response.data.data as [];
-      const parse = data.map((e: ApiRes) => JSON.parse(e.data));
-      return parse;
+      const parse:unknown = data.map((e:ApiRes) => (e.data));
+      return parse as Shapes[]
     } catch (error) {
       console.log(JSON.stringify(error));
       return [];
@@ -242,6 +247,7 @@ export class Game {
     this.ctx.lineCap = "round";
     this.ctx.lineJoin = "round";
     const shape: Shapes = {
+      id: crypto.randomUUID(),
       type: "line",
       strokeColor: this.strokeColor.current,
       startX: this.startX,
@@ -250,10 +256,17 @@ export class Game {
       endY: offsetY,
     };
     this.existingShapes.push(shape);
+    const data = JSON.stringify({
+      type: "shape:freehand",
+      roomId: this.roomId,
+      shape: JSON.stringify(shape)
+    })
+    this.sendMessage(data)
   }
 
   BroadCastRectangle(width: number, height: number) {
     const shape: Shapes = {
+      id: crypto.randomUUID(),
       type: "rectangle",
       strokeColor: this.strokeColor.current,
       X: this.startX,
@@ -278,6 +291,7 @@ export class Game {
     const radiusY = Math.abs(height / 2);
 
     const shape: Shapes = {
+      id: crypto.randomUUID(),
       type: "ellipse",
       centerX,
       centerY,
@@ -296,6 +310,7 @@ export class Game {
   }
   BroadCastLine(offsetX: number, offsetY: number) {
     const shape: Shapes = {
+      id: crypto.randomUUID(),
       type: "line",
       startX: this.startX,
       startY: this.startY,
@@ -314,6 +329,7 @@ export class Game {
   }
   BroadCastTriangle(offsetX: number, offsetY: number) {
     const shape: Shapes = {
+      id: crypto.randomUUID(),
       type: "triangle",
       startX: this.startX,
       startY: this.startY,
@@ -339,7 +355,7 @@ export class Game {
     this.history.push(popped);
     this.ClearCanvas();
     const data = {
-      type:"shape:undo",
+      type:"shape:delete",
       shape:popped,
       roomId:this.roomId,
     }

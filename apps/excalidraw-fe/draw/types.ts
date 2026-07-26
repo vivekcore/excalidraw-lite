@@ -9,6 +9,7 @@ export type Tshape =
 
 export type Shapes =
   | {
+      id:string;
       type: "rectangle";
       X: number;
       Y: number;
@@ -17,6 +18,7 @@ export type Shapes =
       strokeColor: string;
     }
   | {
+    id:string;
       type: "ellipse";
       centerX: number;
       centerY: number;
@@ -25,6 +27,7 @@ export type Shapes =
       strokeColor: string;
     }
   | {
+    id:string;
       type: "line";
       startX: number;
       startY: number;
@@ -33,6 +36,7 @@ export type Shapes =
       strokeColor: string;
     }
   | {
+    id:string;
       type: "triangle";
       startX: number;
       startY: number;
@@ -41,6 +45,7 @@ export type Shapes =
       strokeColor: string;
     }
   | {
+    id:string;
       type: "pencil";
       startX: number;
       startY: number;
