@@ -2,6 +2,7 @@ import { broadcastToAll, broadcastToRoom } from "../utils/broadcast";
 import { connectionStore } from "../store";
 import { WebSocket } from "ws";
 import { mainQueue } from "../config/Queue";
+
 export const ShapeHandler = {
   createShape: async (ws: WebSocket, msg: any) => {
     try {
@@ -9,19 +10,19 @@ export const ShapeHandler = {
       if (!conn) return;
       const roomId = Number(msg.roomId);
       if (!msg.shape || !roomId) return;
-
+      const shape = JSON.parse(msg.shape);
       const data = {
         roomId,
         userId: conn.userId,
-        data: msg.shape,
+        data: shape,
+        shapeId: shape.id,
       };
-      const res = await mainQueue.add("create-shape", data, {
+      await mainQueue.add("create-shape", data, {
         attempts: 3,
         backoff: { type: "exponential", delay: 500 },
         removeOnComplete: true,
         removeOnFail: false,
       });
-
 
       broadcastToRoom(
         String(msg.roomId),
@@ -39,11 +40,11 @@ export const ShapeHandler = {
       if (!conn || !msg.shapeId || !msg.shape) return;
 
       const data = {
-        id: msg.shapeId,
+        shapeId: msg.shape.id,
         shape: msg.shape,
         roomId: Number(msg.roomId),
       };
-      const res = await mainQueue.add("update-shape", data, {
+      await mainQueue.add("update-shape", data, {
         attempts: 3,
         backoff: { type: "exponential", delay: 500 },
         removeOnComplete: true,
@@ -52,7 +53,7 @@ export const ShapeHandler = {
 
       broadcastToRoom(
         String(msg.roomId),
-        { type: "shape:update", shapeId: msg.shapeId, shape: msg.shape },
+        { type: "shape:update", shape: msg.shape },
         ws,
       );
     } catch (error) {
@@ -63,56 +64,57 @@ export const ShapeHandler = {
   deleteShape: async (ws: WebSocket, msg: any) => {
     try {
       const conn = connectionStore.get(ws);
-      if (!conn || !msg.shapeId) return;
-
+      const shape = msg.shape;
+      if (!conn || !shape.id) return;
       const data = {
-        id: msg.shapeId,
+        shapeId: shape.id,
         roomId: Number(msg.roomId),
       };
-      const res = await mainQueue.add("delete-shape", data, {
+      await mainQueue.add("delete-shape", data, {
         attempts: 3,
         backoff: { type: "exponential", delay: 500 },
         removeOnComplete: true,
         removeOnFail: false,
       });
       broadcastToRoom(
-        String(res.data.roomId),
-        { type: "shape:delete", shapeId: msg.shapeId },
+        String(msg.roomId),
+        { type: "shape:delete", shapeId: msg.shape.id },
         ws,
       );
     } catch (error) {
       console.error("shape:delete error:", error);
     }
   },
-  deleteAll: async(ws: WebSocket, msg: any)  => {
-    const conn = connectionStore.get(ws)
+  deleteAll: async (ws: WebSocket, msg: any) => {
+    const conn = connectionStore.get(ws);
     const data = {
       roomId: msg.roomId,
       adminId: conn?.userId,
-    }
-      await mainQueue.add("deleteAll", data, {
-        attempts: 3,
-        backoff: { type: "exponential", delay: 500 },
-        removeOnComplete: true,
-        removeOnFail: false,
-      });
+    };
+    await mainQueue.add("deleteAll", data, {
+      attempts: 3,
+      backoff: { type: "exponential", delay: 500 },
+      removeOnComplete: true,
+      removeOnFail: false,
+    });
 
-       broadcastToAll(
-        String(msg.roomId),
-        { type: "shape:deleteAll",status:"Canvas cleared"},
-      );
-      
+    broadcastToAll(String(msg.roomId), {
+      type: "shape:deleteAll",
+      status: "Canvas cleared",
+    });
   },
-  redo: async (ws:WebSocket,msg:any) => {
-    const data = {
-      shapeId: msg.shape,
-      roomId: msg.roomId,
-    }
-    await mainQueue.add("undo", data, {
-        attempts: 3,
-        backoff: { type: "exponential", delay: 500 },
-        removeOnComplete: true,
-        removeOnFail: false,
-      });
-  }
+  freehand: (ws: WebSocket, msg: any) => {
+    const conn = connectionStore.get(ws);
+    if (!conn) return;
+    const shape = JSON.parse(msg.shape);
+    console.log(shape);
+    broadcastToRoom(
+      String(msg.roomId),
+      {
+        type: "shape:freehand",
+        shape: shape,
+      },
+      ws,
+    );
+  },
 };

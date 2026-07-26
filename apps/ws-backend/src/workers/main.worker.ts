@@ -7,7 +7,7 @@ const worker = new Worker(
   async (job: Job) => {
     switch (job.name) {
       case "create-shape":
-        await prisma.shape.create({
+        await prisma.shape.create({      
           data: {
             ...job.data,
           },
@@ -21,12 +21,12 @@ const worker = new Worker(
         break;
       case "delete-shape":
         const shape = await prisma.shape.findUnique({
-          where: { id: job.data.id },
+          where: { shapeId: job.data.shapeId },
           select: { roomId: true },
         });
         if (shape) {
           await prisma.shape.delete({
-            where: { id: job.data.id },
+            where: { shapeId: job.data.shapeId },
           });
         }
         break;
@@ -52,14 +52,6 @@ const worker = new Worker(
                 roomId: Number(job.data.roomId)
               }
             }
-          }
-        })
-        break;
-      case "undo":
-        await prisma.shape.deleteMany({
-          where: {
-            data: job.data.shape,
-            roomId: Number(job.data.roomId)
           }
         })
         break;
