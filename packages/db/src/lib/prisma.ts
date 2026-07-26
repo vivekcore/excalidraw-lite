@@ -1,34 +1,65 @@
-<<<<<<< HEAD
-import dns from 'dns';
-dns.setDefaultResultOrder('ipv4first');
-=======
 
->>>>>>> 2caf724fe31e6ef57265fd129fdd471efda94d14
-import { neonConfig } from '@neondatabase/serverless'
-import { PrismaNeon } from '@prisma/adapter-neon'
-import ws from 'ws'
-import { PrismaClient } from '../generated/prisma/client.js'
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../generated/prisma/client.js';
 
-neonConfig.webSocketConstructor = ws
+const globalForPrisma = global as unknown as { prisma?: PrismaClient };
 
-const createPrismaClient = () => {
-  const adapter = new PrismaNeon({
-    connectionString: process.env.DATABASE_URL!,
-  })
-
-  return new PrismaClient({ adapter })
-}
-
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
 
 export const prisma =
-  globalForPrisma.prisma ?? createPrismaClient()
+  globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma
+  globalForPrisma.prisma = prisma;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import { neonConfig } from '@neondatabase/serverless'
+// import { PrismaNeon } from '@prisma/adapter-neon'
+// import ws from 'ws'
+// import { PrismaClient } from '../generated/prisma/client.js'
+
+// neonConfig.webSocketConstructor = ws
+
+// const createPrismaClient = () => {
+//   const adapter = new PrismaNeon({
+//     connectionString: process.env.DATABASE_URL!,
+//   })
+
+//   return new PrismaClient({ adapter })
+// }
+
+// const globalForPrisma = globalThis as unknown as {
+//   prisma: PrismaClient | undefined
+// }
+
+// export const prisma =
+//   globalForPrisma.prisma ?? createPrismaClient()
+
+// if (process.env.NODE_ENV !== 'production') {
+//   globalForPrisma.prisma = prisma
+// }
 
 
 

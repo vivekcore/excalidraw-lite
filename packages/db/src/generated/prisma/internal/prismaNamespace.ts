@@ -780,6 +780,7 @@ export type RoomScalarFieldEnum = (typeof RoomScalarFieldEnum)[keyof typeof Room
 
 export const ShapeScalarFieldEnum = {
   id: 'id',
+  shapeId: 'shapeId',
   roomId: 'roomId',
   userId: 'userId',
   data: 'data',

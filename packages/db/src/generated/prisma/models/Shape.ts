@@ -36,6 +36,7 @@ export type ShapeSumAggregateOutputType = {
 
 export type ShapeMinAggregateOutputType = {
   id: string | null
+  shapeId: string | null
   roomId: number | null
   userId: string | null
   createdAt: Date | null
@@ -44,6 +45,7 @@ export type ShapeMinAggregateOutputType = {
 
 export type ShapeMaxAggregateOutputType = {
   id: string | null
+  shapeId: string | null
   roomId: number | null
   userId: string | null
   createdAt: Date | null
@@ -52,6 +54,7 @@ export type ShapeMaxAggregateOutputType = {
 
 export type ShapeCountAggregateOutputType = {
   id: number
+  shapeId: number
   roomId: number
   userId: number
   data: number
@@ -71,6 +74,7 @@ export type ShapeSumAggregateInputType = {
 
 export type ShapeMinAggregateInputType = {
   id?: true
+  shapeId?: true
   roomId?: true
   userId?: true
   createdAt?: true
@@ -79,6 +83,7 @@ export type ShapeMinAggregateInputType = {
 
 export type ShapeMaxAggregateInputType = {
   id?: true
+  shapeId?: true
   roomId?: true
   userId?: true
   createdAt?: true
@@ -87,6 +92,7 @@ export type ShapeMaxAggregateInputType = {
 
 export type ShapeCountAggregateInputType = {
   id?: true
+  shapeId?: true
   roomId?: true
   userId?: true
   data?: true
@@ -183,6 +189,7 @@ export type ShapeGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 
 export type ShapeGroupByOutputType = {
   id: string
+  shapeId: string
   roomId: number
   userId: string
   data: runtime.JsonValue
@@ -215,6 +222,7 @@ export type ShapeWhereInput = {
   OR?: Prisma.ShapeWhereInput[]
   NOT?: Prisma.ShapeWhereInput | Prisma.ShapeWhereInput[]
   id?: Prisma.StringFilter<"Shape"> | string
+  shapeId?: Prisma.StringFilter<"Shape"> | string
   roomId?: Prisma.IntFilter<"Shape"> | number
   userId?: Prisma.StringFilter<"Shape"> | string
   data?: Prisma.JsonFilter<"Shape">
@@ -226,6 +234,7 @@ export type ShapeWhereInput = {
 
 export type ShapeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  shapeId?: Prisma.SortOrder
   roomId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   data?: Prisma.SortOrder
@@ -237,6 +246,7 @@ export type ShapeOrderByWithRelationInput = {
 
 export type ShapeWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  shapeId?: string
   AND?: Prisma.ShapeWhereInput | Prisma.ShapeWhereInput[]
   OR?: Prisma.ShapeWhereInput[]
   NOT?: Prisma.ShapeWhereInput | Prisma.ShapeWhereInput[]
@@ -247,10 +257,11 @@ export type ShapeWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Shape"> | Date | string
   room?: Prisma.XOR<Prisma.RoomScalarRelationFilter, Prisma.RoomWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "shapeId">
 
 export type ShapeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  shapeId?: Prisma.SortOrder
   roomId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   data?: Prisma.SortOrder
@@ -268,6 +279,7 @@ export type ShapeScalarWhereWithAggregatesInput = {
   OR?: Prisma.ShapeScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ShapeScalarWhereWithAggregatesInput | Prisma.ShapeScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Shape"> | string
+  shapeId?: Prisma.StringWithAggregatesFilter<"Shape"> | string
   roomId?: Prisma.IntWithAggregatesFilter<"Shape"> | number
   userId?: Prisma.StringWithAggregatesFilter<"Shape"> | string
   data?: Prisma.JsonWithAggregatesFilter<"Shape">
@@ -277,6 +289,7 @@ export type ShapeScalarWhereWithAggregatesInput = {
 
 export type ShapeCreateInput = {
   id?: string
+  shapeId: string
   data: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -286,6 +299,7 @@ export type ShapeCreateInput = {
 
 export type ShapeUncheckedCreateInput = {
   id?: string
+  shapeId: string
   roomId: number
   userId: string
   data: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -295,6 +309,7 @@ export type ShapeUncheckedCreateInput = {
 
 export type ShapeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -304,6 +319,7 @@ export type ShapeUpdateInput = {
 
 export type ShapeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   roomId?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -313,6 +329,7 @@ export type ShapeUncheckedUpdateInput = {
 
 export type ShapeCreateManyInput = {
   id?: string
+  shapeId: string
   roomId: number
   userId: string
   data: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -322,6 +339,7 @@ export type ShapeCreateManyInput = {
 
 export type ShapeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -329,6 +347,7 @@ export type ShapeUpdateManyMutationInput = {
 
 export type ShapeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   roomId?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -348,6 +367,7 @@ export type ShapeOrderByRelationAggregateInput = {
 
 export type ShapeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  shapeId?: Prisma.SortOrder
   roomId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   data?: Prisma.SortOrder
@@ -361,6 +381,7 @@ export type ShapeAvgOrderByAggregateInput = {
 
 export type ShapeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  shapeId?: Prisma.SortOrder
   roomId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -369,6 +390,7 @@ export type ShapeMaxOrderByAggregateInput = {
 
 export type ShapeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  shapeId?: Prisma.SortOrder
   roomId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -465,6 +487,7 @@ export type ShapeUncheckedUpdateManyWithoutRoomNestedInput = {
 
 export type ShapeCreateWithoutUserInput = {
   id?: string
+  shapeId: string
   data: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -473,6 +496,7 @@ export type ShapeCreateWithoutUserInput = {
 
 export type ShapeUncheckedCreateWithoutUserInput = {
   id?: string
+  shapeId: string
   roomId: number
   data: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -510,6 +534,7 @@ export type ShapeScalarWhereInput = {
   OR?: Prisma.ShapeScalarWhereInput[]
   NOT?: Prisma.ShapeScalarWhereInput | Prisma.ShapeScalarWhereInput[]
   id?: Prisma.StringFilter<"Shape"> | string
+  shapeId?: Prisma.StringFilter<"Shape"> | string
   roomId?: Prisma.IntFilter<"Shape"> | number
   userId?: Prisma.StringFilter<"Shape"> | string
   data?: Prisma.JsonFilter<"Shape">
@@ -519,6 +544,7 @@ export type ShapeScalarWhereInput = {
 
 export type ShapeCreateWithoutRoomInput = {
   id?: string
+  shapeId: string
   data: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -527,6 +553,7 @@ export type ShapeCreateWithoutRoomInput = {
 
 export type ShapeUncheckedCreateWithoutRoomInput = {
   id?: string
+  shapeId: string
   userId: string
   data: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -561,6 +588,7 @@ export type ShapeUpdateManyWithWhereWithoutRoomInput = {
 
 export type ShapeCreateManyUserInput = {
   id?: string
+  shapeId: string
   roomId: number
   data: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -569,6 +597,7 @@ export type ShapeCreateManyUserInput = {
 
 export type ShapeUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -577,6 +606,7 @@ export type ShapeUpdateWithoutUserInput = {
 
 export type ShapeUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   roomId?: Prisma.IntFieldUpdateOperationsInput | number
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -585,6 +615,7 @@ export type ShapeUncheckedUpdateWithoutUserInput = {
 
 export type ShapeUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   roomId?: Prisma.IntFieldUpdateOperationsInput | number
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -593,6 +624,7 @@ export type ShapeUncheckedUpdateManyWithoutUserInput = {
 
 export type ShapeCreateManyRoomInput = {
   id?: string
+  shapeId: string
   userId: string
   data: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
@@ -601,6 +633,7 @@ export type ShapeCreateManyRoomInput = {
 
 export type ShapeUpdateWithoutRoomInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -609,6 +642,7 @@ export type ShapeUpdateWithoutRoomInput = {
 
 export type ShapeUncheckedUpdateWithoutRoomInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -617,6 +651,7 @@ export type ShapeUncheckedUpdateWithoutRoomInput = {
 
 export type ShapeUncheckedUpdateManyWithoutRoomInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  shapeId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   data?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -627,6 +662,7 @@ export type ShapeUncheckedUpdateManyWithoutRoomInput = {
 
 export type ShapeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  shapeId?: boolean
   roomId?: boolean
   userId?: boolean
   data?: boolean
@@ -638,6 +674,7 @@ export type ShapeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 
 export type ShapeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  shapeId?: boolean
   roomId?: boolean
   userId?: boolean
   data?: boolean
@@ -649,6 +686,7 @@ export type ShapeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 
 export type ShapeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  shapeId?: boolean
   roomId?: boolean
   userId?: boolean
   data?: boolean
@@ -660,6 +698,7 @@ export type ShapeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 
 export type ShapeSelectScalar = {
   id?: boolean
+  shapeId?: boolean
   roomId?: boolean
   userId?: boolean
   data?: boolean
@@ -667,7 +706,7 @@ export type ShapeSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ShapeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "roomId" | "userId" | "data" | "createdAt" | "updatedAt", ExtArgs["result"]["shape"]>
+export type ShapeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "shapeId" | "roomId" | "userId" | "data" | "createdAt" | "updatedAt", ExtArgs["result"]["shape"]>
 export type ShapeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   room?: boolean | Prisma.RoomDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -689,6 +728,7 @@ export type $ShapePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    shapeId: string
     roomId: number
     userId: string
     data: runtime.JsonValue
@@ -1120,6 +1160,7 @@ export interface Prisma__ShapeClient<T, Null = never, ExtArgs extends runtime.Ty
  */
 export interface ShapeFieldRefs {
   readonly id: Prisma.FieldRef<"Shape", 'String'>
+  readonly shapeId: Prisma.FieldRef<"Shape", 'String'>
   readonly roomId: Prisma.FieldRef<"Shape", 'Int'>
   readonly userId: Prisma.FieldRef<"Shape", 'String'>
   readonly data: Prisma.FieldRef<"Shape", 'Json'>
